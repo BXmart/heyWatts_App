@@ -11,7 +11,8 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".app/context/**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "components/TextInput.js"  ]
 }
