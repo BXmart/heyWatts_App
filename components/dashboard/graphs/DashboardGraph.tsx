@@ -20,7 +20,7 @@ const DashboardGraph = ({ data }: { data: any }) => {
     predictedEuros: data?.predictedEuros,
   };
   const parsedData = parseDashboardData(objectData, graphType);
-  console.log({ parsedData });
+
   /*   if (!data) {
     return <Text>Loading</Text>;
   }
