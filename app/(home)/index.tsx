@@ -31,7 +31,7 @@ export default function Dashboard() {
   if (!userInfo) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
+        <Text>Loading...ters{!userInfo}</Text>
       </View>
     );
   }

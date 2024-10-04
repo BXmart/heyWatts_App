@@ -1,16 +1,5 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-  Button,
-  Pressable,
-  Image,
-} from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Button, Pressable, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, Redirect, router } from "expo-router";
@@ -19,8 +8,7 @@ import { URLS } from "@/utils/constants";
 import useAuthStore from "@/stores/useAuthStore";
 
 export default function SignInPage() {
-  const { userInfo, loading, error, success, login, logout, register } =
-    useAuthStore();
+  const { userInfo, loading, error, success, login, logout, register } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +17,8 @@ export default function SignInPage() {
   const handleLogin = async () => {
     const result = await login({ email, password });
     if (!result || result.error) {
-      alert(result.message ?? "");
+      console.error({ result });
+      alert(result.error ?? "");
     } else {
       router.replace(URLS.APP_INDEX);
     }
@@ -39,58 +28,31 @@ export default function SignInPage() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <View style={styles.leftPanel}>
-          <LinearGradient
-            colors={["#4ade80", "#22c55e"]}
-            style={styles.gradient}
-          >
-            <Image
-              width={100}
-              source={require("@/assets/branding/hw-logo-hor-dark-01.png")}
-              style={styles.logo}
-            />
+          <LinearGradient colors={["#4ade80", "#22c55e"]} style={styles.gradient}>
+            <Image width={100} source={require("@/assets/branding/hw-logo-hor-dark-01.png")} style={styles.logo} />
             <Text style={styles.welcomeText}>¡Bienvenido!</Text>
-            <Text style={styles.welcomeSubtext}>
-              Comience a gestionar su energía de manera inteligente y con
-              eficiencia.
-            </Text>
+            <Text style={styles.welcomeSubtext}>Comience a gestionar su energía de manera inteligente y con eficiencia.</Text>
           </LinearGradient>
         </View>
         <View style={styles.rightPanel}>
           <Text style={styles.inputLabel}>Correo electrónico</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setEmail}
-            value={email}
-            placeholder="Ingrese su correo electrónico"
-            keyboardType="email-address"
-          />
+          <TextInput style={styles.input} onChangeText={setEmail} value={email} placeholder="Ingrese su correo electrónico" keyboardType="email-address" />
 
           <Text style={styles.inputLabel}>Contraseña</Text>
           <View style={styles.passwordContainer}>
-            <TextInput
-              style={styles.passwordInput}
-              onChangeText={setPassword}
-              value={password}
-              placeholder="Ingrese su contraseña"
-              secureTextEntry={!showPassword}
-            />
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.eyeIcon}
-            >
-              <Ionicons
-                name={showPassword ? "eye-off" : "eye"}
-                size={24}
-                color="gray"
-              />
+            <TextInput style={styles.passwordInput} onChangeText={setPassword} value={password} placeholder="Ingrese su contraseña" secureTextEntry={!showPassword} />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="gray" />
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity>
-            <Text style={styles.forgotPassword}>
-              ¿Ha olvidado la contraseña?
-            </Text>
+            <Text style={styles.forgotPassword}>¿Ha olvidado la contraseña?</Text>
           </TouchableOpacity>
+
+          <View>
+            <Text style={{ color: "red" }}>{error}</Text>
+          </View>
 
           <LoginButton
             style={{

@@ -76,8 +76,11 @@ const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       set({ loading: true });
       const userJson = await SecureStore.getItemAsync('userInfo');
+
       if (userJson) {
         const parsedUser = JSON.parse(userJson) as UserContextT;
+        if (parsedUser.user.propertyByDefault?._id) {
+        }
         set({ userInfo: parsedUser });
       }
 
@@ -89,8 +92,10 @@ const useAuthStore = create<AuthStore>((set, get) => ({
   },
   login: async ({ email, password }) => {
     set({ loading: true });
-
     try {
+
+      console.log(`${API_URL}/api/v1/web/login`)
+      console.log({ email, password })
       const { data: loginResponse } = await axios.post(`${API_URL}/api/v1/web/login`, {
         username: email,
         password,
@@ -155,7 +160,6 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       set({ loading: false });
     }
   },
-
   logout: async () => {
     await SecureStore.deleteItemAsync('userInfo');
     set(initialState);

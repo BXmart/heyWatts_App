@@ -19,7 +19,7 @@ export default function HomeLayout() {
   }, []);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return <Text>Loading...asd</Text>;
   }
 
   if (!userInfo || (!userInfo.token && !loading)) {
@@ -37,21 +37,10 @@ export default function HomeLayout() {
         name="index"
         options={{
           title: "Dashboard",
-          tabBarIcon: ({ color }) => (
-            <Entypo name="bar-graph" size={24} color="black" />
-          ),
+          tabBarIcon: ({ color }) => <Entypo name="bar-graph" size={24} color="black" />,
           headerRight: () => (
             <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <AntDesign
-                    name="user"
-                    size={24}
-                    color={Colors[colorScheme ?? "light"].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
+              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color={Colors[colorScheme ?? "light"].text} style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }} />}</Pressable>
             </Link>
           ),
         }}

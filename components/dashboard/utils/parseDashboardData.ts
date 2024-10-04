@@ -1,9 +1,26 @@
 import moment from 'moment';
 
 export enum GraphType {
-  Consumption = 0,
-  Prediction = 1,
-  Money = 2,
+  Money = 0,
+  Energy = 1,
+}
+
+export enum Colors {
+  LOW = '#ffcfc6',
+  MODERATE = '#ff7e67',
+  STANDARD = '#db3214',
+  HIGH = '#c52b10',
+  CRITICAL = '#4a0f05',
+  SURPLUS_COMPENSATION_NONE = '#082620',
+  SURPLUS_COMPENSATION_LOW = '#156752',
+  SURPLUS_COMPENSATION_MODERATE = '#4bbc96',
+  SURPLUS_COMPENSATION_HIGH = '#b2e8d0',
+}
+
+enum BarColors {
+  red = '#c52b10',
+  orange = '#fb923c',
+  green = '#22C55E',
 }
 
 interface ConsumptionDataItem {
@@ -26,10 +43,9 @@ interface PredictionDataItem {
   surplus_energy_wh: number;
   createdAt: Date;
   updatedAt: null;
-}
-
-interface PredictedEurosDataItem {
-
+  flat: number;
+  tip: number;
+  valley: number;
 }
 
 export interface DashboardData {
@@ -38,96 +54,108 @@ export interface DashboardData {
   predictedEuros?: PredictionDataItem[];
 }
 
-export interface ReturnDashboardData {
-  consumptionData?: ParsedDataItem[];
-  predictionData?: ParsedDataItem[];
-  predictedEuros?: ParsedDataItem[];
-}
-
-
 export interface ParsedDataItem {
   value: number;
   label: string;
-  frontColor: string;
-  topLabelComponent?: () => JSX.Element;
+  frontColor?: string;
+  datetime: Date;
+  gradientColor?: string;
 }
 
+export interface ReturnDashboardData {
+  parsedData: ParsedDataItem[];
+  parsedPredictionData: ParsedDataItem[];
+}
+const parseEnergyData = (
+  data: DashboardData,
+  parsedData: ParsedDataItem[],
+  parsedPredictionData: ParsedDataItem[]
+): ReturnDashboardData => {
+  const { consumptionData, predictionData } = data;
 
-
-const parseDashboardData = (data: DashboardData, graphType: GraphType): ParsedDataItem[] => {
-  const tempArray = Array.from({ length: 24 }, (_, index) => ({
-    value: 0,
-    label: moment().startOf('day').add(index, 'hours').format('HH:mm'),
-    frontColor: "#e6e6e6",
-  }));
-
-  const parsedData: ParsedDataItem[] = tempArray;
-
-  const array = graphType === GraphType.Consumption ? data.consumptionData : graphType === GraphType.Prediction ? data.predictionData : data.predictedEuros;
-
-  if (array && graphType === GraphType.Consumption) {
-
-    (array as ConsumptionDataItem[]).forEach((item: ConsumptionDataItem, index: number) => {
-      const currentHour = new Date(item.createdAt).getHours();
-      const date = moment(item.createdAt);
-      const hour = date.hour();
+  if (consumptionData) {
+    consumptionData.forEach((item) => {
+      const itemDateTime = moment(item.createdAt, 'YYYY-MM-DD HH:mm:ss');
+      const index = itemDateTime.hour();
 
       parsedData[index] = {
-        value: item.net,
-        label: parsedData[index].label,
-        frontColor: "green",
-        /* topLabelComponent: createLabelComponent({
-          text: 'Consumption',
-          color: 'blue',
-          fontSize: 8,
-          rotationDegree: -45
-        }) */
+        value: item.net / 1000,
+        label: index % 2 === 0 ? itemDateTime.format('HH:00') : '',
+        frontColor: item.tip !== 0 ? BarColors.red : item.flat !== 0 ? BarColors.orange : BarColors.green,
+        datetime: itemDateTime.toDate(),
       };
     });
   }
 
-  // Parse predictionData
-  if (array && graphType === GraphType.Prediction) {
-    (array as PredictionDataItem[]).forEach((item: PredictionDataItem, index: number) => {
-      const currentHour = new Date(item.createdAt).getHours();
+  if (predictionData) {
+    predictionData.forEach((item) => {
+      const itemDateTime = moment(item.createdAt);
+      const index = itemDateTime.hour();
 
-      parsedData[index] = {
-        value: item.consumptionWh + item.surplus_energy_wh,
-        label: parsedData[index].label,
-        frontColor: "green",
-        /* topLabelComponent: createLabelComponent({
-          text: 'Predcition',
-          color: 'blue',
-          fontSize: 8,
-          rotationDegree: -45
-        }) */
+      parsedPredictionData[index] = {
+        value: (item.consumptionWh + item.surplus_energy_wh) / 1000,
+        label: index % 2 === 0 ? itemDateTime.format('HH:00') : '',
+        frontColor: item.tip !== 0 ? BarColors.red : item.flat !== 0 ? BarColors.orange : BarColors.green,
+        datetime: itemDateTime.toDate(),
       };
     });
   }
 
-  // Parse predictedEuros
-  /* if (array && graphType === GraphType.Euros) {
-    (array as Euros[]).forEach((item: PredictionDataItem, index: number) => {
-      const currentHour = new Date(item.createdAt).getHours();
+  return { parsedData, parsedPredictionData };
+};
 
-      predictedEuros[currentHour] = {
-        value: item.consumptionWh ?? 0, // Ensure non-negative value
-        label: moment(item.createdAt).format('HH:mm'),
-        frontColor: "orange",
-        /* topLabelComponent: createLabelComponent({
-          text: 'Predicted €',
-          color: 'blue',
-          fontSize: 8,
-          rotationDegree: -45
-        }) 
+const parseMoneyData = (
+  data: any,
+  parsedData: ParsedDataItem[]
+): ParsedDataItem[] => {
+  const { consumptionData } = data;
+  if (consumptionData) {
+    consumptionData.forEach((item: any) => {
+      console.log({ item })
+      const itemDateTime = moment(item.createdAt, 'YYYY-MM-DD HH:mm:ss');
+      const index = itemDateTime.hour();
+      const isSurplus = (item.tip + item.valley + item.flat) <= 0;
+
+      parsedData[index] = {
+        value: Number(Math.abs(item.tip + item.valley + item.flat).toFixed(2)),
+        label: index % 2 === 0 ? itemDateTime.format('HH:00') : '',
+        gradientColor: (item.tip + item.valley + item.flat) > 0.50 ? Colors.MODERATE : isSurplus ? Colors.SURPLUS_COMPENSATION_MODERATE : Colors.LOW,
+        frontColor: isSurplus ? Colors.SURPLUS_COMPENSATION_MODERATE : Colors.LOW,
+        datetime: itemDateTime.toDate(),
       };
     });
-  } */
-
-  // Sort the result by date
-  parsedData.sort((a, b) => moment(a.label, 'HH:mm').valueOf() - moment(b.label, 'HH:mm').valueOf());
+  }
 
   return parsedData;
 };
 
-export default parseDashboardData;
+const createEmptyDataArray = (): ParsedDataItem[] => {
+  return Array.from({ length: 24 }, (_, index) => ({
+    value: 0,
+    label: index % 2 === 0 ? moment().startOf('day').add(index, 'hours').format('HH:00') : '',
+    frontColor: '#e6e6e6',
+    datetime: moment().startOf('day').add(index, 'hours').toDate(),
+  }));
+};
+
+const parseDashboardData = (data: DashboardData | null, graphType: GraphType): ReturnDashboardData => {
+  let parsedData = createEmptyDataArray();
+  let parsedPredictionData = createEmptyDataArray();
+
+  if (!data) {
+    return { parsedData, parsedPredictionData };
+  }
+
+  if (graphType === GraphType.Money) {
+    parsedData = parseMoneyData(data, parsedData);
+  } else {
+    ({ parsedData, parsedPredictionData } = parseEnergyData(data, parsedData, parsedPredictionData));
+  }
+
+  parsedData.sort((a, b) => a.datetime.getTime() - b.datetime.getTime());
+  parsedPredictionData.sort((a, b) => a.datetime.getTime() - b.datetime.getTime());
+
+  return { parsedData, parsedPredictionData };
+};
+
+export default parseDashboardData
