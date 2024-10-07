@@ -74,7 +74,7 @@ export const URLS = {
   APP_OWNER_DETAIL_INSTALLATION: '/home/my-installations/:orderId',
   APP_OWNER_EDIT_PROPERTY: '/home/my-properties/:propertyId/edit',
   APP_OWNER_NEW_PROPERTY: '/home/my-properties/new',
-  APP_OWNER_UNDERSTAND_BILL: '/home/understand-bill',
+  APP_OWNER_UNDERSTAND_BILL: '/understand-bill',
   APP_OWNER_PROPOSALS: '/home/proposals',
   APP_OWNER_DETAIL_PROPOSALS: '/home/proposals/:propertyId',
   APP_MAINTENANCE: '/home/maintenance',

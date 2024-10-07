@@ -1,37 +1,34 @@
-import { Redirect, Slot, Link, Tabs, router } from "expo-router";
-import React, { useEffect } from "react";
-import { Text, useColorScheme } from "react-native";
+import { Link, Redirect, Tabs, useRouter } from "expo-router";
+import React, { PropsWithChildren, ReactElement, ReactNode, ReactPortal, useEffect } from "react";
+import { Pressable, useColorScheme } from "react-native";
 import { URLS } from "@/utils/constants";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Pressable } from "react-native";
 import Colors from "@/utils/Colors";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import Entypo from "@expo/vector-icons/Entypo";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import useAuthStore from "@/stores/useAuthStore";
+import { Text } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { View } from "@/components/Themed";
 
 export default function HomeLayout() {
-  const { loading, userInfo, initialize } = useAuthStore();
+  const { user, isLoading } = useAuthStore();
   const colorScheme = useColorScheme();
-  useEffect(() => {
-    //Initialize checks user token
-    initialize();
-  }, []);
+  const router = useRouter();
 
-  if (loading) {
-    return <Text>Loading...asd</Text>;
+  if (isLoading) {
+    return <Text>Loading root</Text>;
   }
 
-  if (!userInfo || (!userInfo.token && !loading)) {
+  if (!user) {
     return <Redirect href={URLS.SIGN_IN} />;
   }
 
   return (
     <Tabs
-      sceneContainerStyle={{ backgroundColor: "gray" }}
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
       }}
+      backBehavior="history"
     >
       <Tabs.Screen
         name="index"
@@ -48,10 +45,18 @@ export default function HomeLayout() {
       <Tabs.Screen
         name="property"
         options={{
-          title: "Propiedad",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "Property",
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
+
+      {/* <Tabs.Screen
+      name="profile"
+      options={{
+        title: "Profile",
+        tabBarIcon: ({ color }) => <TabBarIcon name="person" color={color} />,
+      }}
+    /> */}
     </Tabs>
   );
 }

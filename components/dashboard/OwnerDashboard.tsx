@@ -1,56 +1,94 @@
-import React, { useEffect } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DashboardGraph from "./graphs/DashboardGraph";
 import useAuthStore from "@/stores/useAuthStore";
 import useDashboard from "@/hooks/useDashboardHook";
 import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
+import { PagedPropertiesResponseI } from "@/app/(home)";
+import PropertyInfograph from "./components/PropertyInfograph";
+import { getOwnerInvoice, InvoiceData } from "@/services/dashboard.service";
+import OwnerDashboardTodayMoneyCard from "./components/info-cards/OwnerDashboardTodayMoneyCard";
+import OwnerDashboardPredictMoneyCard from "./components/info-cards/OwnerDashboardPredictMoneyCard";
+import OwnerDashboardTopEnergyConsumedCard from "./components/info-cards/OwnerDashboardTopEnergyConsumed";
+import OwnerDashboardTopMoneyConsumedCard from "./components/info-cards/OwnerDashboardTopMoneyCard";
+import TopSwiperCards from "./components/info-cards/TopSwiperCards";
+import MarketPriceGraphs from "./graphs/MarketGraph";
 
-const OwnerDashboard: React.FC = () => {
-  const { userInfo } = useAuthStore();
-  const { loading, error, setPropertyId } = useDashboard();
-
-  const glob = useGlobalSearchParams<{ propertyId: string }>();
-  const local = useLocalSearchParams();
+const OwnerDashboard = ({
+  consumptionData,
+  dashboardData,
+  properties,
+  marketPrices,
+  currentProperty,
+  setCurrentProperty,
+}: {
+  consumptionData: any;
+  dashboardData: any;
+  properties: PagedPropertiesResponseI;
+  marketPrices: any;
+  currentProperty: string | undefined;
+  setCurrentProperty: Dispatch<SetStateAction<string | undefined>>;
+}) => {
+  const { user, isLoading } = useAuthStore();
+  const [invoiceData, setInvoiceData] = useState<InvoiceData>();
+  const { currentDate } = useDashboard();
 
   useEffect(() => {
-    if (glob.propertyId) setPropertyId(glob.propertyId);
-  }, [glob]);
+    const getData = async () => {
+      try {
+        const response = await getOwnerInvoice(user!.user.propertyByDefault?._id!);
+        console.log({ response });
+        setInvoiceData(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  if (!userInfo) {
-    return null;
+    getData();
+  }, []);
+
+  if (isLoading || !user) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...{!user}</Text>
+      </View>
+    );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        <Text style={styles.subtitle}>Panel de control</Text>
-        <View style={styles.header}>
-          <Text style={styles.title}>Bienvenido, {userInfo.user.name}</Text>
-        </View>
-
-        {loading ? <Text>Loading..asds.</Text> : error ? <Text>Error: {error}</Text> : <DashboardGraph />}
-      </ScrollView>
-    </SafeAreaView>
+    <ScrollView contentContainerStyle={styles.scrollView}>
+      <TopSwiperCards data={dashboardData} hasMeterDevices={true} />
+      <DashboardGraph initialData={consumptionData} currentProperty={currentProperty} />
+      <MarketPriceGraphs
+        data={dashboardData}
+        energyPrice={marketPrices}
+        energyCompPrice={marketPrices.energyCompPrice}
+        currentDate={currentDate}
+        handleGraphModeChange={() => {}}
+        graphMode={0}
+        setCurrentDate={() => {}}
+      />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: "column",
+    gap: 10,
+    justifyContent: "flex-start",
     backgroundColor: "#f5f5f5",
   },
   scrollView: {
     flexGrow: 1,
-    padding: 16,
   },
   subtitle: {
     fontSize: 12,
     color: "#64748B",
   },
-  header: {
-    marginBottom: 16,
-  },
+  header: {},
   title: {
     fontSize: 24,
     fontWeight: "bold",

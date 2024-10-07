@@ -46,124 +46,68 @@ type RegisterFunction = (
   organizacion?: string
 ) => Promise<RegisterSuccessResponse | RegisterErrorResponse>;
 
-interface AuthStore {
-  userInfo: UserContextT | null;
-  loading: boolean;
-  error: string | null;
-  success: boolean;
+interface AuthState {
+  user: UserContextT | null;
   token: string | null;
-  resetStore: () => void;
+  isLoading: boolean;
+  error: string | null;
+}
+
+interface AuthActions {
   initialize: () => Promise<void>;
-  login: (credentials: { email: string; password: string }) => Promise<any>;
-  register: (formData: RegisterData) => Promise<any>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (formData: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
 }
 
-const initialState = {
-  userInfo: null,
-  loading: false,
-  error: null,
-  success: false,
-  token: null
-};
+type AuthStore = AuthState & AuthActions;
 
 const useAuthStore = create<AuthStore>((set, get) => ({
-  ...initialState,
-  resetStore: () => {
-    set({ loading: false, success: false, error: null });
-  },
+  user: null,
+  token: null,
+  isLoading: true,
+  error: null,
+  loading: true,
   initialize: async () => {
     try {
-      set({ loading: true });
       const userJson = await SecureStore.getItemAsync('userInfo');
-
       if (userJson) {
-        const parsedUser = JSON.parse(userJson) as UserContextT;
-        if (parsedUser.user.propertyByDefault?._id) {
-        }
-        set({ userInfo: parsedUser });
+        const user = JSON.parse(userJson) as UserContextT;
+        set({ user, token: user.token, isLoading: false });
+      } else {
+        set({ isLoading: false });
       }
-
-      set({ loading: false });
     } catch (error) {
-      console.error('Error initializing auth store:', error);
-      set({ loading: false, error: 'Failed to initialize auth store' });
+      set({ error: 'Failed to initialize auth', isLoading: false });
     }
   },
-  login: async ({ email, password }) => {
-    set({ loading: true });
+
+  login: async (email: string, password: string) => {
     try {
-
-      console.log(`${API_URL}/api/v1/web/login`)
-      console.log({ email, password })
-      const { data: loginResponse } = await axios.post(`${API_URL}/api/v1/web/login`, {
-        username: email,
-        password,
-      });
-
-      await SecureStore.setItemAsync('userInfo', JSON.stringify(loginResponse));
-
-      set({
-        error: null,
-        success: true,
-        userInfo: loginResponse
-      });
-
-      return { error: false, ...loginResponse };
+      set({ isLoading: true, error: null });
+      const { data } = await axios.post(`${API_URL}/api/v1/web/login`, { username: email, password });
+      await SecureStore.setItemAsync('userInfo', JSON.stringify(data));
+      set({ user: data, token: data.token, isLoading: false });
     } catch (error: any) {
-      set({
-        success: false,
-        error: error?.response?.data?.message || error.message
-      });
-
-      return { error: error?.response?.data?.message || error.message };
-    } finally {
-      set({ loading: false });
+      set({ error: error.response?.data?.message || 'Login failed', isLoading: false });
     }
   },
+
   register: async (formData: RegisterData) => {
     try {
-      set({ loading: true });
-
-      RegisterSchema.parse(formData);
-
-      const { data: registerData } = await axios.post(
-        `${API_URL}/api/v1/web/register`,
-        formData
-      );
-
-      set({ error: null, success: true });
-
-      return { error: false, ...registerData };
+      set({ isLoading: true, error: null });
+      const { data } = await axios.post(`${API_URL}/api/v1/web/register`, formData);
+      await SecureStore.setItemAsync('userInfo', JSON.stringify(data));
+      set({ user: data, token: data.token, isLoading: false });
     } catch (error: any) {
-
-      let errorMessage = '';
-
-      if (error instanceof z.ZodError) {
-        errorMessage = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      }
-
-      set({
-        success: false,
-        error: errorMessage
-      });
-
-      return {
-        error: true,
-        message:
-          errorMessage ||
-          "An error occurred during registration",
-      };
-    } finally {
-      set({ loading: false });
+      set({ error: error.response?.data?.message || 'Registration failed', isLoading: false });
     }
   },
+
   logout: async () => {
     await SecureStore.deleteItemAsync('userInfo');
-    set(initialState);
-  }
+    set({ user: null, token: null });
+  },
 }));
 
-export default useAuthStore;
+export default useAuthStore

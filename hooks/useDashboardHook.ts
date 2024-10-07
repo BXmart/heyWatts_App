@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, SetStateAction, Dispatch } from 'react';
 import { getDashboardConsumptionAndPredictionGraph, getEnergyPricesByPropertyId } from "@/services/dashboard.service";
 import moment from "moment";
 import parseDashboardData, { DashboardData, GraphType, ParsedDataItem } from "@/components/dashboard/utils/parseDashboardData";
 import { validatePathConfig } from '@react-navigation/native';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 interface DashboardHookResult {
   parsedEnergyData: ParsedDataItem[];
@@ -12,10 +13,10 @@ interface DashboardHookResult {
   initialDataLoaded: boolean;
   error: string | null;
   graphType: GraphType;
-  fetchDashboardData: () => Promise<void>;
+  fetchDashboardData: (proeprtyId: string) => Promise<void>;
   setGraphType: (type: GraphType) => void;
   currentDate: string;
-  setCurrentDate: (date: string) => void;
+  setCurrentDate: Dispatch<SetStateAction<string>>;
   propertyId: string | null;
   setPropertyId: (id: string | null) => void;
 }
@@ -31,13 +32,11 @@ const useDashboard = (): DashboardHookResult => {
   const [initialDataLoaded, setInitialDataLoaded] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [graphType, setGraphType] = useState<GraphType>(GraphType.Money);
-  const [currentDate, setCurrentDate] = useState<string>(moment().format('YYYY-MM-DD'));
+  const [currentDate, setCurrentDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  const fetchDashboardData = useCallback(async () => {
-
-    if (!propertyId) return;
-
-    console.log('Fetching dashboard data');
+  const fetchDashboardData = useCallback(async (propertyIdParam: string | null) => {
+    const propertyIdVal = propertyIdParam || propertyId
+    if (!propertyIdVal) return;
     setLoading(true);
     setError(null);
 
@@ -53,8 +52,8 @@ const useDashboard = (): DashboardHookResult => {
         .format('YYYY-MM-DD HH:mm:ss');
 
       const [energyData, moneyData] = await Promise.all([
-        getDashboardConsumptionAndPredictionGraph({ propertyId, date: formattedDate }),
-        getEnergyPricesByPropertyId(propertyId, formattedDate)
+        getDashboardConsumptionAndPredictionGraph({ propertyId: propertyIdVal, date: formattedDate }),
+        getEnergyPricesByPropertyId(propertyIdVal, formattedDate)
       ]);
 
       if (!energyData || !moneyData) {
@@ -64,8 +63,6 @@ const useDashboard = (): DashboardHookResult => {
       // Parse both types of data
       const parsedEnergyData = parseDashboardData(energyData, GraphType.Energy);
       const parsedMoneyData = parseDashboardData(energyData, GraphType.Money);
-
-      console.log({ parsedEnergyData, parsedMoneyData });
 
       setEnergyData(energyData);
       setMoneyData(moneyData);
@@ -84,18 +81,20 @@ const useDashboard = (): DashboardHookResult => {
 
   useEffect(() => {
     if (!initialDataLoaded) {
-      fetchDashboardData();
+      fetchDashboardData(propertyId);
     }
   }, [fetchDashboardData, initialDataLoaded]);
 
   useEffect(() => {
-    fetchDashboardData();
+    if (propertyId) {
+      fetchDashboardData(propertyId);
+    }
   }, [propertyId, currentDate]);
 
   const handleSetGraphType = useCallback((type: GraphType) => {
     setGraphType(type);
     if (!initialDataLoaded) {
-      fetchDashboardData();
+      fetchDashboardData(propertyId);
     }
   }, [fetchDashboardData, initialDataLoaded]);
 

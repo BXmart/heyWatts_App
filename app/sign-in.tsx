@@ -8,20 +8,14 @@ import { URLS } from "@/utils/constants";
 import useAuthStore from "@/stores/useAuthStore";
 
 export default function SignInPage() {
-  const { userInfo, loading, error, success, login, logout, register } = useAuthStore();
+  const { user, error, login } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    const result = await login({ email, password });
-    if (!result || result.error) {
-      console.error({ result });
-      alert(result.error ?? "");
-    } else {
-      router.replace(URLS.APP_INDEX);
-    }
+    const result = await login(email, password);
   };
 
   return (

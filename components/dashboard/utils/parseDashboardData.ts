@@ -111,7 +111,6 @@ const parseMoneyData = (
   const { consumptionData } = data;
   if (consumptionData) {
     consumptionData.forEach((item: any) => {
-      console.log({ item })
       const itemDateTime = moment(item.createdAt, 'YYYY-MM-DD HH:mm:ss');
       const index = itemDateTime.hour();
       const isSurplus = (item.tip + item.valley + item.flat) <= 0;
