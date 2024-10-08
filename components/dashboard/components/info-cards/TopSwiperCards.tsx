@@ -10,6 +10,7 @@ import OwnerDashboardTodayMoneyCard from "./OwnerDashboardTodayMoneyCard";
 import OwnerDashboardPredictMoneyCard from "./OwnerDashboardPredictMoneyCard";
 import OwnerDashboardTopEnergyConsumedCard from "./OwnerDashboardTopEnergyConsumed";
 import OwnerDashboardTopMoneyConsumedCard from "./OwnerDashboardTopMoneyCard";
+import { string } from "zod";
 
 const { width } = Dimensions.get("window");
 
@@ -20,7 +21,7 @@ interface TopSwiperCardsProps {
 
 const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }) => {
   const [invoiceData, setInvoiceData] = useState<InvoiceData>();
-  const [visibleHelp, setVisibleHelp] = useState({ isOpen: false, data: null });
+  const [visibleHelp, setVisibleHelp] = useState({ isOpen: false, data: null as "prediction" | "actual" | null });
   const [error, setError] = useState(false);
 
   const hasBattery = data?.deviceDashboard?.batteries !== 0;
@@ -39,11 +40,12 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
     setVisibleHelp({ isOpen: boolean, data });
   };
 
-  const otherCosts = (data: InvoiceData) => {
-    const totalCost = data?.[visibleHelp.data]?.totalCost;
-    const energyTermCost = data?.[visibleHelp.data]?.energyTermCost;
-    const powerTermCost = data?.[visibleHelp.data]?.powerTermCost;
-    const costPenalty = data?.[visibleHelp.data]?.costPenalty;
+  const otherCosts = (data?: InvoiceData) => {
+    if (!data) return 0;
+    const totalCost = data?.[visibleHelp.data ?? "actual"]?.totalCost;
+    const energyTermCost = data?.[visibleHelp.data ?? "actual"]?.energyTermCost;
+    const powerTermCost = data?.[visibleHelp.data ?? "actual"]?.powerTermCost;
+    const costPenalty = data?.[visibleHelp.data ?? "actual"]?.costPenalty;
 
     return totalCost - energyTermCost - powerTermCost - costPenalty;
   };
@@ -59,26 +61,26 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
         {/* Left column */}
         <View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data]?.powerTermCost?.toFixed(2) || "0.00"}€</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.powerTermCost?.toFixed(2) || "0.00"}€</Text>
             <Text style={styles.modalLabel}>Término Potencia</Text>
           </View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data]?.energyTermCost?.toFixed(2) || "0.00"}€</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.energyTermCost?.toFixed(2) || "0.00"}€</Text>
             <Text style={styles.modalLabel}>Término Energía</Text>
           </View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data]?.costPenalty?.toFixed(2) || "0.00"}€</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.costPenalty?.toFixed(2) || "0.00"}€</Text>
             <Text style={styles.modalLabel}>Penalización</Text>
           </View>
         </View>
         {/* Right column */}
         <View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data]?.energyConsumed?.toFixed(2) || "0.00"} kWh</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.energyConsumed?.toFixed(2) || "0.00"} kWh</Text>
             <Text style={styles.modalLabel}>Energía Consumida</Text>
           </View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data]?.energySurplus?.toFixed(2) || "0.00"} kWh</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.energySurplus?.toFixed(2) || "0.00"} kWh</Text>
             <Text style={styles.modalLabel}>Energía Volcada</Text>
           </View>
           <View style={styles.modalRow}>
@@ -109,7 +111,7 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
       <Modal isVisible={visibleHelp.isOpen} onBackdropPress={() => setVisibleHelp({ isOpen: false, data: null })} style={styles.modal}>
         {renderModalContent()}
       </Modal>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={true}>
         {(hasMeterDevices || hasBattery || hasInverter) && (
           <View style={styles.slide}>
             <PropertyInfograph data={data} hasBattery={hasBattery} hasInverter={hasInverter} />
@@ -142,7 +144,8 @@ const styles = StyleSheet.create({
     height: 180,
   },
   slide: {
-    width: width - 20,
+    width: "auto",
+    maxWidth: width - 32,
     paddingHorizontal: 5,
   },
   errorCard: {

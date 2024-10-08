@@ -1,19 +1,15 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import DashboardGraph from "./graphs/DashboardGraph";
 import useAuthStore from "@/stores/useAuthStore";
 import useDashboard from "@/hooks/useDashboardHook";
-import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 import { PagedPropertiesResponseI } from "@/app/(home)";
-import PropertyInfograph from "./components/PropertyInfograph";
 import { getOwnerInvoice, InvoiceData } from "@/services/dashboard.service";
-import OwnerDashboardTodayMoneyCard from "./components/info-cards/OwnerDashboardTodayMoneyCard";
-import OwnerDashboardPredictMoneyCard from "./components/info-cards/OwnerDashboardPredictMoneyCard";
-import OwnerDashboardTopEnergyConsumedCard from "./components/info-cards/OwnerDashboardTopEnergyConsumed";
-import OwnerDashboardTopMoneyConsumedCard from "./components/info-cards/OwnerDashboardTopMoneyCard";
 import TopSwiperCards from "./components/info-cards/TopSwiperCards";
 import MarketPriceGraphs from "./graphs/MarketGraph";
+import { analyzeCompPrices, analyzeEnergyPrices } from "./utils/circularTimeRangeUtils";
+import CircularTimeRangesSwiper from "./components/CircularTimeRange/CircularTimeRangesSwiper.component";
+import PropertyInfograph from "./components/PropertyInfograph";
 
 const OwnerDashboard = ({
   consumptionData,
@@ -22,6 +18,7 @@ const OwnerDashboard = ({
   marketPrices,
   currentProperty,
   setCurrentProperty,
+  compensationPrices,
 }: {
   consumptionData: any;
   dashboardData: any;
@@ -29,16 +26,18 @@ const OwnerDashboard = ({
   marketPrices: any;
   currentProperty: string | undefined;
   setCurrentProperty: Dispatch<SetStateAction<string | undefined>>;
+  compensationPrices: any[];
 }) => {
   const { user, isLoading } = useAuthStore();
   const [invoiceData, setInvoiceData] = useState<InvoiceData>();
-  const { currentDate } = useDashboard();
+  const { currentDate, setCurrentDate } = useDashboard();
+  const energySlots = analyzeEnergyPrices(marketPrices);
+  const compSlots = analyzeCompPrices(compensationPrices);
 
   useEffect(() => {
     const getData = async () => {
       try {
         const response = await getOwnerInvoice(user!.user.propertyByDefault?._id!);
-        console.log({ response });
         setInvoiceData(response);
       } catch (error) {
         console.error(error);
@@ -58,17 +57,13 @@ const OwnerDashboard = ({
 
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
-      <TopSwiperCards data={dashboardData} hasMeterDevices={true} />
-      <DashboardGraph initialData={consumptionData} currentProperty={currentProperty} />
-      <MarketPriceGraphs
-        data={dashboardData}
-        energyPrice={marketPrices}
-        energyCompPrice={marketPrices.energyCompPrice}
-        currentDate={currentDate}
-        handleGraphModeChange={() => {}}
-        graphMode={0}
-        setCurrentDate={() => {}}
-      />
+      <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+        <PropertyInfograph data={dashboardData} hasBattery={true} hasInverter={true} />
+        <CircularTimeRangesSwiper energySlots={energySlots} compSlots={compSlots} />
+      </View>
+      {/* <TopSwiperCards data={dashboardData} hasMeterDevices={true} /> */}
+      <DashboardGraph dashboardData={dashboardData} initialData={consumptionData} currentProperty={currentProperty} />
+      <MarketPriceGraphs data={dashboardData} energyPrice={marketPrices} energyCompPrice={marketPrices.energyCompPrice} currentDate={currentDate} setCurrentDate={setCurrentDate} />
     </ScrollView>
   );
 };

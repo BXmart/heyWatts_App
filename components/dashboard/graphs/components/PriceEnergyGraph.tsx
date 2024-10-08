@@ -7,6 +7,8 @@ interface PriceEnergyGraphProps {
   data: EnergyDayPriceI[];
 }
 
+const { width } = Dimensions.get("window");
+
 const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
   const [parsedData, setParsedData] = useState<any[]>([]);
 
@@ -15,7 +17,7 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
       const sortedData = data
         .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())
         .map((item) => ({
-          value: parseFloat(item.price.toFixed(3)),
+          value: parseFloat(item.price.toFixed(2)),
           label: new Date(item.datetime).getHours().toString(),
           frontColor: item.tip ? "#ef4444" : item.flat ? "#fb923c" : item.valley ? "#22C55E" : "#94a3b8",
           topLabelComponent: () => <Text style={styles.topLabel}>{item.price.toFixed(3)}</Text>,
@@ -26,7 +28,17 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
 
   const renderTooltip = (item: any) => {
     return (
-      <View style={styles.tooltip}>
+      <View
+        style={{
+          position: "absolute",
+          bottom: 40,
+          marginLeft: -12,
+          backgroundColor: "#164E63",
+          paddingHorizontal: 6,
+          paddingVertical: 4,
+          borderRadius: 4,
+        }}
+      >
         <Text style={styles.tooltipText}>{`${item.label}:00`}</Text>
         <Text style={styles.tooltipText}>
           Precio de la luz: <Text style={styles.boldText}>{item.value.toFixed(3)}€/kWh</Text>
@@ -39,13 +51,20 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
     <View style={styles.container}>
       <BarChart
         data={parsedData}
-        width={Dimensions.get("window").width - 60}
+        width={width - 100}
         height={200}
-        barWidth={10}
-        spacing={2}
-        hideRules
-        xAxisThickness={1}
-        yAxisThickness={1}
+        barWidth={22}
+        barBorderRadius={5}
+        xAxisIndicesWidth={1}
+        yAxisThickness={0}
+        xAxisThickness={0}
+        xAxisLabelTextStyle={{ color: "gray" }}
+        yAxisLabelWidth={20}
+        isAnimated
+        animationDuration={75}
+        dashWidth={20}
+        dashGap={10}
+        lineBehindBars
         yAxisTextStyle={styles.yAxisText}
         noOfSections={5}
         maxValue={Math.max(...parsedData.map((item) => item.value))}

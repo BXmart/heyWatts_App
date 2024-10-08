@@ -16,7 +16,6 @@ const IconBattery = () => <MaterialCommunityIcons name="car-battery" size={24} c
 
 const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashboardI; hasBattery: boolean; hasInverter: boolean }) => {
   const getArrowDirection = (value: number, position: "up" | "down" | "left" | "right") => {
-    console.log({ value, position });
     if (position === "up") {
       if (value > 0) return "chevrons-up";
       if (value < 0) return "chevrons-down";
@@ -28,13 +27,13 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
       return "minus";
     }
     if (position === "left") {
-      if (value > 0) return "chevrons-right";
-      if (value < 0) return "chevrons-left";
+      if (value > 0) return "chevrons-left";
+      if (value < 0) return "chevrons-right";
       return "minus";
     }
     if (position === "right") {
-      if (value > 0) return "chevrons-left";
-      if (value < 0) return "chevrons-right";
+      if (value > 0) return "chevrons-right";
+      if (value < 0) return "chevrons-left";
       return "minus";
     }
   };
@@ -92,7 +91,7 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
 
 const styles = StyleSheet.create({
   card: {
-    width: width / 2 - 20,
+    width: width / 2.7,
     padding: 5,
     maxHeight: 140,
     height: 140,

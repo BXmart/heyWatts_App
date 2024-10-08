@@ -4,7 +4,6 @@ import { Card } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 
 const OwnerDashboardTodayMoneyCard = ({ invoiceData, openModal }: any) => {
-  console.log({ invoiceData });
   return (
     <Card style={styles.card}>
       <View>

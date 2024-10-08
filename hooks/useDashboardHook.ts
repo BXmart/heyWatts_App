@@ -4,6 +4,7 @@ import moment from "moment";
 import parseDashboardData, { DashboardData, GraphType, ParsedDataItem } from "@/components/dashboard/utils/parseDashboardData";
 import { validatePathConfig } from '@react-navigation/native';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import { ConsumptionGraphData } from '@/types/OwnerDashboard';
 
 interface DashboardHookResult {
   parsedEnergyData: ParsedDataItem[];
@@ -19,6 +20,8 @@ interface DashboardHookResult {
   setCurrentDate: Dispatch<SetStateAction<string>>;
   propertyId: string | null;
   setPropertyId: (id: string | null) => void;
+  originalEnergyData: DashboardData | null;
+  originalMoneyData: DashboardData | null;
 }
 
 const useDashboard = (): DashboardHookResult => {
@@ -64,6 +67,8 @@ const useDashboard = (): DashboardHookResult => {
       const parsedEnergyData = parseDashboardData(energyData, GraphType.Energy);
       const parsedMoneyData = parseDashboardData(energyData, GraphType.Money);
 
+      console.log({ energyData })
+      console.log({ moneyData })
       setEnergyData(energyData);
       setMoneyData(moneyData);
       setParsedEnergyData(parsedEnergyData.parsedData);
@@ -102,6 +107,8 @@ const useDashboard = (): DashboardHookResult => {
     parsedEnergyData,
     parsedEnergyPredictionData,
     parsedMoneyData,
+    originalEnergyData: energyData,
+    originalMoneyData: moneyData,
     loading,
     initialDataLoaded,
     error,

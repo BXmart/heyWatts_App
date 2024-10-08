@@ -7,6 +7,8 @@ interface ExcessCompensationGraphProps {
   data: EnergyDayPriceI[];
 }
 
+const { width } = Dimensions.get("window");
+
 const ExcessCompensationGraph: React.FC<ExcessCompensationGraphProps> = memo(({ data }) => {
   const [parsedData, setParsedData] = useState<any[]>([]);
 
@@ -15,7 +17,7 @@ const ExcessCompensationGraph: React.FC<ExcessCompensationGraphProps> = memo(({ 
       const sortedData = data
         .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())
         .map((item) => ({
-          value: parseFloat(item.price.toFixed(3)),
+          value: parseFloat((item.price * 10).toFixed(2)),
           label: new Date(item.datetime).getHours().toString(),
           frontColor: "#4e798a",
           topLabelComponent: () => <Text style={styles.topLabel}>{item.price.toFixed(3)}</Text>,
@@ -39,13 +41,20 @@ const ExcessCompensationGraph: React.FC<ExcessCompensationGraphProps> = memo(({ 
     <View style={styles.container}>
       <BarChart
         data={parsedData}
-        width={Dimensions.get("window").width - 60}
+        width={width - 100}
         height={200}
-        barWidth={10}
-        spacing={2}
-        hideRules
-        xAxisThickness={1}
-        yAxisThickness={1}
+        barWidth={22}
+        barBorderRadius={5}
+        xAxisIndicesWidth={1}
+        yAxisThickness={0}
+        xAxisThickness={0}
+        xAxisLabelTextStyle={{ color: "gray" }}
+        yAxisLabelWidth={20}
+        isAnimated
+        animationDuration={75}
+        dashWidth={20}
+        dashGap={10}
+        lineBehindBars
         yAxisTextStyle={styles.yAxisText}
         noOfSections={5}
         maxValue={Math.max(...parsedData.map((item) => item.value))}

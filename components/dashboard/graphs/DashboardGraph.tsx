@@ -11,12 +11,15 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import moment from "moment";
 import { ActivityIndicator } from "react-native-paper";
 import Colors from "@/utils/Colors";
+import { analyzeCompPrices, analyzeEnergyPrices } from "../utils/circularTimeRangeUtils";
+import EnergyMoneyResume from "./components/EnergyMoneyResume";
+import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
 
 const { width } = Dimensions.get("window");
 
-const DashboardGraph = React.memo(({ initialData, currentProperty }: { initialData: any; currentProperty: string | undefined }) => {
-  const { user } = useAuthStore();
-  const { graphType, parsedEnergyData, parsedEnergyPredictionData, parsedMoneyData, loading, setGraphType, setCurrentDate, currentDate, setPropertyId } = useDashboard();
+const DashboardGraph = React.memo(({ dashboardData, initialData, currentProperty }: { dashboardData: OwnerDashboardI; initialData: EnergyDayPriceI[]; currentProperty: string | undefined }) => {
+  const { graphType, parsedEnergyData, parsedEnergyPredictionData, parsedMoneyData, originalEnergyData, originalMoneyData, loading, setGraphType, setCurrentDate, currentDate, setPropertyId } =
+    useDashboard();
 
   const currentData = useMemo(() => (graphType === GraphType.Energy ? parsedEnergyData : parsedMoneyData), [graphType, parsedEnergyData, parsedMoneyData]);
 
@@ -44,12 +47,31 @@ const DashboardGraph = React.memo(({ initialData, currentProperty }: { initialDa
     });
   }, [setCurrentDate]);
 
-  const maxValue = useMemo(
-    () => Math.max(...currentData.map((item) => item.value), ...(graphType === GraphType.Energy ? parsedEnergyPredictionData.map((item) => item.value) : [])),
-    [currentData, parsedEnergyPredictionData, graphType]
-  );
+  const maxValue = Math.max(...currentData.map((item) => item.value), ...(graphType === GraphType.Energy ? parsedEnergyPredictionData.map((item) => item.value) : []));
 
-  const minValue = useMemo(() => Math.min(...currentData.map((item) => item.value), ...parsedEnergyPredictionData.map((item) => item.value)), [currentData, parsedEnergyPredictionData]);
+  const minValue = Math.min(...currentData.map((item) => item.value), ...parsedEnergyPredictionData.map((item) => item.value));
+
+  const renderTooltip = (item: any) => {
+    return (
+      <View
+        style={{
+          position: "absolute",
+          bottom: 40,
+          marginLeft: -12,
+          /* backgroundColor: "#164E63", */
+          paddingHorizontal: 6,
+          paddingVertical: 4,
+          borderRadius: 4,
+          color: "white",
+        }}
+      >
+        <Text style={styles.tooltipText}>{`${item.label}:00`}</Text>
+        <Text style={styles.tooltipText}>
+          Precio de la luz: <Text style={styles.boldText}>{item.value.toFixed(3)}€/kWh</Text>
+        </Text>
+      </View>
+    );
+  };
 
   if (!initialData) {
     return <Text>Waiting for data...</Text>;
@@ -88,25 +110,26 @@ const DashboardGraph = React.memo(({ initialData, currentProperty }: { initialDa
           width={width - 100}
           height={200}
           barWidth={22}
-          showGradient={graphType == GraphType.Money}
           barBorderRadius={5}
-          noOfSections={graphType == GraphType.Money ? 2 : 4}
           xAxisIndicesWidth={1}
           yAxisThickness={0}
           xAxisThickness={0}
           xAxisLabelTextStyle={{ color: "gray" }}
           yAxisLabelWidth={20}
           isAnimated
-          animationDuration={150}
+          animationDuration={75}
+          dashWidth={20}
+          dashGap={10}
+          lineBehindBars
+          renderTooltip={renderTooltip}
+          showGradient={graphType == GraphType.Money}
+          noOfSections={graphType == GraphType.Money ? 2 : 4}
           yAxisTextStyle={{
             color: "gray",
             fontSize: 11,
             marginRight: 0,
             paddingLeft: 0,
           }}
-          dashWidth={20}
-          dashGap={10}
-          lineBehindBars
           showLine={graphType === GraphType.Energy}
           lineConfig={{
             color: "#F29C6E",
@@ -115,7 +138,7 @@ const DashboardGraph = React.memo(({ initialData, currentProperty }: { initialDa
             hideDataPoints: true,
           }}
           lineData={parsedEnergyPredictionData}
-          renderTooltip={(item: any, index: number) => {
+          /*  renderTooltip={(item: any, index: number) => {
             return (
               <View
                 style={{
@@ -131,7 +154,7 @@ const DashboardGraph = React.memo(({ initialData, currentProperty }: { initialDa
                 <Text style={{ color: "white", fontWeight: "bold" }}>{item.value}</Text>
               </View>
             );
-          }}
+          }} */
         />
       )}
       <View style={styles.navigationContainer}>
@@ -146,6 +169,8 @@ const DashboardGraph = React.memo(({ initialData, currentProperty }: { initialDa
           </View>
         </TouchableOpacity>
       </View>
+
+      {dashboardData && <EnergyMoneyResume data={dashboardData} dateData={graphType == GraphType.Money ? originalMoneyData : originalEnergyData} currentGraphMode={graphType} />}
     </Card>
   );
 });
@@ -185,6 +210,26 @@ const styles = StyleSheet.create({
     height: 200,
     justifyContent: "center",
     alignItems: "center",
+  },
+  tooltip: {
+    backgroundColor: "white",
+    padding: 8,
+    borderRadius: 4,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  tooltipText: {
+    fontSize: 12,
+    color: "#64748B",
+  },
+  boldText: {
+    fontWeight: "bold",
   },
 });
 

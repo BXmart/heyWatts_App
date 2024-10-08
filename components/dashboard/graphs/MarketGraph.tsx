@@ -11,23 +11,23 @@ import { URLS } from "@/utils/constants";
 import PriceEnergyGraph from "./components/PriceEnergyGraph";
 import ExcessCompensationGraph from "./components/ExcessCompensationGraph";
 import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
 interface MarketPriceGraphsProps {
   data: OwnerDashboardI;
   energyPrice: EnergyDayPriceI[];
   energyCompPrice: EnergyDayPriceI[];
   currentDate: string;
-  handleGraphModeChange: (number: number) => void;
-  graphMode: number;
   setCurrentDate: (string: string) => void;
 }
 
-const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice, energyCompPrice, currentDate, handleGraphModeChange, graphMode, setCurrentDate }) => {
+const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice, energyCompPrice, currentDate, setCurrentDate }) => {
   const [visibleHelp, setVisibleHelp] = useState(false);
   const [energyPriceState, setEnergyPriceState] = useState(energyPrice);
   const [energyCompPriceState, setEnergyCompPriceState] = useState(energyCompPrice);
   const { user } = useAuthStore();
   const navigation = useNavigation();
+  const [graphMode, setGraphMode] = useState(0);
 
   const hasBattery = data?.deviceDashboard?.batteries !== 0;
   const hasInverter = data?.deviceDashboard?.inverterHuawei !== 0 || data?.deviceDashboard?.inverterFronius !== 0;
@@ -40,7 +40,7 @@ const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice
   };
 
   const handleOnChange = (number: number) => {
-    handleGraphModeChange(number);
+    setGraphMode(number);
   };
 
   const handleClickToday = () => {
@@ -87,14 +87,13 @@ const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice
         ) : (
           <>
             {hasInverter && (
-              <View style={styles.tabsContainer}>
-                <TouchableOpacity style={[styles.tab, graphMode === 0 && styles.activeTab]} onPress={() => handleOnChange(0)}>
-                  <Text style={[styles.tabText, graphMode === 0 && styles.activeTabText]}>Precio de la luz</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.tab, graphMode === 1 && styles.activeTab]} onPress={() => handleOnChange(1)}>
-                  <Text style={[styles.tabText, graphMode === 1 && styles.activeTabText]}>Comp. por excedentes</Text>
-                </TouchableOpacity>
-              </View>
+              <SegmentedControl
+                values={["Precio de la luz", "Comp. por excedentes"]}
+                selectedIndex={graphMode}
+                onChange={(event) => {
+                  handleOnChange(event.nativeEvent.selectedSegmentIndex);
+                }}
+              />
             )}
             {graphMode === 0 ? <PriceEnergyGraph data={energyPriceState} /> : <ExcessCompensationGraph data={energyCompPriceState} />}
             <Text style={styles.infoText}>
@@ -103,7 +102,8 @@ const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice
           </>
         )}
       </View>
-      <View style={styles.buttonContainer}>
+
+      {/* <View style={styles.buttonContainer}>
         <Button mode="contained" onPress={handleClickToday} style={styles.button}>
           Ver precios de hoy
         </Button>
@@ -112,7 +112,7 @@ const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice
             Entiende tu factura
           </Button>
         )}
-      </View>
+      </View> */}
     </Card>
   );
 };

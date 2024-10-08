@@ -7,11 +7,14 @@ import OwnerDashboard from "@/components/dashboard/OwnerDashboard";
 import AdminDashboard from "@/components/dashboard/AdminDashboard";
 import InstallerDashboard from "@/components/dashboard/InstallerDashboard";
 import useAuthStore from "@/stores/useAuthStore";
-import { getEnergyCompensationPricesByPropertyId, getPagesPropertiesByUserId } from "@/services/properties.service";
+import { getEnergyCompensationPricesByPropertyId, getPagesPropertiesByUserId, getPropertyDetailsById } from "@/services/properties.service";
 import { getDashboardConsumptionAndPredictionGraph, getEnergyPricesByPropertyId, getOwnerDashboard, getOwnerInvoice } from "@/services/dashboard.service";
 import moment from "moment";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { set } from "zod";
+import { DashboardData } from "@/components/dashboard/utils/parseDashboardData";
+import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
+import { DetailPropertyI } from "@/types/DetailProperty";
 
 export interface PropertyI {
   _id: string;
@@ -39,10 +42,11 @@ export default function Dashboard() {
   useEffect(() => {
     if (user && user!.user.propertyByDefault?._id) {
       initialize()
-        .then(([dashboardData, properties, consumptionData, marketPrices, compensationPrices]) => {
-          setDashboardData(dashboardData);
+        .then(([dashboardData, propertyDetails, properties, consumptionData, marketPrices, compensationPrices]) => {
+          setDashboardData(dashboardData as OwnerDashboardI);
+          setCurrentProperty((propertyDetails as DetailPropertyI)._id);
           setProperties(properties);
-          setConsumptionData(consumptionData);
+          setConsumptionData(consumptionData as EnergyDayPriceI[]);
           setMarketPrices(marketPrices);
           setCompensationPrices(compensationPrices);
         })
@@ -55,6 +59,7 @@ export default function Dashboard() {
   const initialize = async () => {
     return await Promise.all([
       getOwnerDashboard(user!.user.propertyByDefault?._id!),
+      getPropertyDetailsById(user!.user.propertyByDefault?._id!),
       getPagesPropertiesByUserId({ userId: user!.user._id, pageSize: "50" }),
       getDashboardConsumptionAndPredictionGraph({ propertyId: user!.user.propertyByDefault?._id!, date: moment(new Date().setHours(0, 0, 0, 0)).format("YYYY-MM-DD HH:mm:ss") }),
       getEnergyPricesByPropertyId(user!.user.propertyByDefault?._id!, moment(new Date().setHours(0, 0, 0, 0)).format("YYYY-MM-DD HH:mm:ss")),
@@ -113,6 +118,7 @@ export default function Dashboard() {
           marketPrices={marketPrices}
           currentProperty={currentProperty}
           setCurrentProperty={setCurrentProperty}
+          compensationPrices={compensationPrices}
         />
       )}
       {user.user.type === ROLES.ADMIN && <AdminDashboard />}
