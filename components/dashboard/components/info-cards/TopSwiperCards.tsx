@@ -112,11 +112,11 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
         {renderModalContent()}
       </Modal>
       <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-        {(hasMeterDevices || hasBattery || hasInverter) && (
+        {/*  {(hasMeterDevices || hasBattery || hasInverter) && (
           <View style={styles.slide}>
             <PropertyInfograph data={data} hasBattery={hasBattery} hasInverter={hasInverter} />
           </View>
-        )}
+        )} */}
         <View style={styles.slide}>
           <OwnerDashboardTodayMoneyCard invoiceData={invoiceData} openModal={handleChangeModal} />
         </View>
@@ -145,8 +145,9 @@ const styles = StyleSheet.create({
   },
   slide: {
     width: "auto",
-    maxWidth: width - 32,
+    maxWidth: width / 2,
     paddingHorizontal: 5,
+    backgroundColor: "transparent",
   },
   errorCard: {
     height: 140,

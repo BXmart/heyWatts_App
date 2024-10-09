@@ -68,7 +68,7 @@ const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice
   }, [currentDate]);
 
   return (
-    <Card style={styles.card}>
+    <Card style={(styles.card, { backgroundColor: "transparent", shadowColor: "transparent" })}>
       <TouchableOpacity style={styles.helpIcon} onPress={() => setVisibleHelp(!visibleHelp)}>
         <Ionicons name="help-circle-outline" size={24} color={visibleHelp ? "#10B981" : "#9CA3AF"} />
       </TouchableOpacity>

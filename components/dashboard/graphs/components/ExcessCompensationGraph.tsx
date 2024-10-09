@@ -43,12 +43,13 @@ const ExcessCompensationGraph: React.FC<ExcessCompensationGraphProps> = memo(({ 
         data={parsedData}
         width={width - 100}
         height={200}
-        barWidth={22}
+        barWidth={10}
+        spacing={2}
         barBorderRadius={5}
         xAxisIndicesWidth={1}
         yAxisThickness={0}
         xAxisThickness={0}
-        xAxisLabelTextStyle={{ color: "gray" }}
+        xAxisLabelTextStyle={{ color: "gray", whiteSpace: "nowrap", width: 16 }}
         yAxisLabelWidth={20}
         isAnimated
         animationDuration={75}

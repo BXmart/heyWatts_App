@@ -10,9 +10,6 @@ import useAuthStore from "@/stores/useAuthStore";
 import { getEnergyCompensationPricesByPropertyId, getPagesPropertiesByUserId, getPropertyDetailsById } from "@/services/properties.service";
 import { getDashboardConsumptionAndPredictionGraph, getEnergyPricesByPropertyId, getOwnerDashboard, getOwnerInvoice } from "@/services/dashboard.service";
 import moment from "moment";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import { set } from "zod";
-import { DashboardData } from "@/components/dashboard/utils/parseDashboardData";
 import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
 import { DetailPropertyI } from "@/types/DetailProperty";
 
@@ -131,20 +128,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: "#0F242A",
   },
   dropdown: {
     height: 50,
-    borderColor: "gray",
+    width: "50%",
+    borderColor: "#DBFFE8",
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
     marginBottom: 16,
+    color: "#DBFFE8",
   },
   placeholderStyle: {
     fontSize: 16,
+    color: "#DBFFE8",
   },
   selectedTextStyle: {
     fontSize: 16,
+    color: "#DBFFE8",
   },
   iconStyle: {
     width: 20,

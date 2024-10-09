@@ -57,6 +57,8 @@ const styles = StyleSheet.create({
     minHeight: 140,
     padding: 16,
     position: "relative",
+    backgroundColor: "transparent",
+    shadowColor: "transparent",
   },
   headerText: {
     fontSize: 14,

@@ -17,7 +17,7 @@ export enum Colors {
   SURPLUS_COMPENSATION_HIGH = '#b2e8d0',
 }
 
-enum BarColors {
+export enum BarColors {
   red = '#c52b10',
   orange = '#fb923c',
   green = '#22C55E',
@@ -117,9 +117,9 @@ const parseMoneyData = (
 
       parsedData[index] = {
         value: Number(Math.abs(item.tip + item.valley + item.flat).toFixed(2)),
-        label: index % 2 === 0 ? itemDateTime.format('HH:00') : '',
-        gradientColor: (item.tip + item.valley + item.flat) > 0.50 ? Colors.MODERATE : isSurplus ? Colors.SURPLUS_COMPENSATION_MODERATE : Colors.LOW,
-        frontColor: isSurplus ? Colors.SURPLUS_COMPENSATION_MODERATE : Colors.LOW,
+        label: itemDateTime.format('HH:00'),
+        gradientColor: (item.tip + item.valley + item.flat) > 0.50 ? Colors.HIGH : isSurplus ? Colors.SURPLUS_COMPENSATION_MODERATE : Colors.MODERATE,
+        frontColor: isSurplus ? Colors.SURPLUS_COMPENSATION_MODERATE : Colors.MODERATE,
         datetime: itemDateTime.toDate(),
       };
     });
@@ -131,7 +131,7 @@ const parseMoneyData = (
 const createEmptyDataArray = (): ParsedDataItem[] => {
   return Array.from({ length: 24 }, (_, index) => ({
     value: 0,
-    label: index % 2 === 0 ? moment().startOf('day').add(index, 'hours').format('HH:00') : '',
+    label: moment().startOf('day').add(index, 'hours').format('HH:00'),
     frontColor: '#e6e6e6',
     datetime: moment().startOf('day').add(index, 'hours').toDate(),
   }));

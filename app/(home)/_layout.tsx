@@ -8,7 +8,9 @@ import Entypo from "@expo/vector-icons/Entypo";
 import useAuthStore from "@/stores/useAuthStore";
 import { Text } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { View } from "@/components/Themed";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function HomeLayout() {
   const { user, isLoading } = useAuthStore();
@@ -26,7 +28,9 @@ export default function HomeLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarStyle: {
+          backgroundColor: "#083344",
+        },
       }}
       backBehavior="history"
     >
@@ -34,10 +38,23 @@ export default function HomeLayout() {
         name="index"
         options={{
           title: "Dashboard",
-          tabBarIcon: ({ color }) => <Entypo name="bar-graph" size={24} color="black" />,
+          headerStyle: {
+            shadowColor: "black",
+            shadowRadius: 4,
+            backgroundColor: "#083344",
+          },
+          headerTitleStyle: {
+            color: "#DBFFE8",
+            fontWeight: "bold",
+            fontSize: 23,
+          },
+          tabBarIcon: ({ color }) => <MaterialIcons name="space-dashboard" size={24} color="#DBFFE8" />,
+          tabBarLabelStyle: {
+            color: "#DBFFE8",
+          },
           headerRight: () => (
             <Link href="/modal" asChild>
-              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color={Colors[colorScheme ?? "light"].text} style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }} />}</Pressable>
+              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color="#DBFFE8" />}</Pressable>
             </Link>
           ),
         }}
@@ -46,7 +63,50 @@ export default function HomeLayout() {
         name="property"
         options={{
           title: "Property",
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          headerStyle: {
+            shadowColor: "black",
+            shadowRadius: 4,
+            backgroundColor: "#083344",
+          },
+          headerTitleStyle: {
+            color: "#DBFFE8",
+            fontWeight: "bold",
+            fontSize: 23,
+          },
+          tabBarIcon: ({ color }) => <FontAwesome6 name="house-chimney" size={24} color="#DBFFE8" />,
+          tabBarLabelStyle: {
+            color: "#DBFFE8",
+          },
+          headerRight: () => (
+            <Link href="/modal" asChild>
+              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color="#DBFFE8" />}</Pressable>
+            </Link>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="suggestions"
+        options={{
+          title: "Sugerencias",
+          headerStyle: {
+            shadowColor: "black",
+            shadowRadius: 4,
+            backgroundColor: "#083344",
+          },
+          headerTitleStyle: {
+            color: "#DBFFE8",
+            fontWeight: "bold",
+            fontSize: 23,
+          },
+          tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color="#DBFFE8" />,
+          tabBarLabelStyle: {
+            color: "#DBFFE8",
+          },
+          headerRight: () => (
+            <Link href="/modal" asChild>
+              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color="#DBFFE8" />}</Pressable>
+            </Link>
+          ),
         }}
       />
 

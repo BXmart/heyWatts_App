@@ -22,7 +22,6 @@ const EnergyMoneyResume = React.memo(({ data, dateData, currentGraphMode, showPr
   const [moneyProductionToday, setMoneyProductionToday] = useState("0");
 
   useEffect(() => {
-    console.log({ dateData });
     if (dateData && dateData.consumptionData) {
       setEnergyConsumptionToday(getEnergyConsumptionToday(dateData.consumptionData));
       setEnergyProductionToday(getEnergyProductionToday(dateData.consumptionData));

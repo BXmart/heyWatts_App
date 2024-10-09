@@ -53,7 +53,8 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
         data={parsedData}
         width={width - 100}
         height={200}
-        barWidth={22}
+        barWidth={12}
+        spacing={2}
         barBorderRadius={5}
         xAxisIndicesWidth={1}
         yAxisThickness={0}

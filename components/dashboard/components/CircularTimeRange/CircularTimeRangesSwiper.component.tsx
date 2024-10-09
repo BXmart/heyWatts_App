@@ -34,7 +34,6 @@ const CircularTimeRangesSwiper = ({ energySlots, compSlots }: { energySlots: Tim
                 alignItems: "center",
               }}
             >
-              <Text>{index == 0 ? "Precio de la luz" : "Compensación por excedentes"}</Text>
               <CircularTimeRangeWrapper slots={item.slots} type={index == 0 ? "energy" : "comp"} />
             </View>
           )}

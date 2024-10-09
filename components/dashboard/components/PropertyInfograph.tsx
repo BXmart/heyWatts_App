@@ -6,13 +6,14 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Feather from "@expo/vector-icons/Feather";
+import DottedLine from "../graphs/components/AnimatedDottedLine";
 
 const { width } = Dimensions.get("window");
-const IconHouse = () => <FontAwesome6 name="house" size={24} color="black" />;
-const IconSolar = () => <MaterialIcons name="solar-power" size={24} color="black" />;
-const IconPylon = () => <MaterialCommunityIcons name="transmission-tower" size={24} color="black" />;
-const IconEnergy = () => <SimpleLineIcons name="energy" size={24} color="black" />;
-const IconBattery = () => <MaterialCommunityIcons name="car-battery" size={24} color="black" />;
+const IconHouse = () => <FontAwesome6 name="house" size={34} color="#10B981" />;
+const IconSolar = () => <MaterialIcons name="solar-power" size={34} color="#10B981" />;
+const IconPylon = () => <MaterialCommunityIcons name="transmission-tower" size={34} color="#10B981" />;
+const IconPlug = () => <FontAwesome6 name="plug-circle-bolt" size={34} color="#10B981" />;
+const IconBattery = () => <MaterialCommunityIcons name="car-battery" size={34} color="#10B981" />;
 
 const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashboardI; hasBattery: boolean; hasInverter: boolean }) => {
   const getArrowDirection = (value: number, position: "up" | "down" | "left" | "right") => {
@@ -51,12 +52,22 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
                 {data.propertyResume.production === 0 ? "0" : Math.abs(data.propertyResume.production / 1000).toFixed(2)} kW
               </Text>
             </View>
-            <Feather name={getArrowDirection(-data.propertyResume.production, "up")} size={24} color="black" />
+            {/* <Feather name={getArrowDirection(-data.propertyResume.production, "up")} size={24} color="#10B981" /> */}
+            <DottedLine length={30} dotSize={10} dotColor="#10B981" reverse={false} direction="vertical" duration={3000} />
           </View>
 
           {/* RIGHT */}
           <View style={styles.rightSection}>
-            <Feather name={getArrowDirection(-data.propertyResume.consumption, "right")} size={24} color="black" />
+            {/* <Feather name={getArrowDirection(-data.propertyResume.consumption, "right")} size={24} color="#10B981" /> */}
+            <DottedLine
+              style={{ top: 15, left: -40, position: "absolute" }}
+              length={50}
+              dotSize={10}
+              dotColor="#10B981"
+              reverse={-data.propertyResume.consumption < 0}
+              direction="horizontal"
+              duration={3000}
+            />
             <View style={{ flex: 1, flexDirection: "row" }}>
               <IconPylon />
               <Text style={[styles.text, styles.rightText, data.propertyResume.consumption !== 0 && styles.animatedText]}>
@@ -67,9 +78,12 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
 
           {/* BOTTOM */}
           <View style={styles.bottomSection}>
-            <Feather name={getArrowDirection(data.propertyResume.total_consumption, "down")} size={24} color="black" />
-
-            <Text style={[styles.text, styles.bottomText]}>{data.propertyResume.total_consumption === 0 ? "0" : Math.abs(data.propertyResume.total_consumption / 1000).toFixed(2)} kW</Text>
+            {/* <Feather name={getArrowDirection(data.propertyResume.total_consumption, "down")} size={24} color="#10B981" /> */}
+            <DottedLine style={{ top: -30, left: 7, position: "absolute" }} length={30} dotSize={10} dotColor="#10B981" reverse={false} direction="vertical" duration={3000} />
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <IconPlug />
+              <Text style={[styles.text, styles.bottomText]}>{data.propertyResume.total_consumption === 0 ? "0" : Math.abs(data.propertyResume.total_consumption / 1000).toFixed(2)} kW</Text>
+            </View>
           </View>
 
           {/* LEFT */}
@@ -80,7 +94,16 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
                 {data.propertyResume.battery === 0 ? "0" : Math.abs(data.propertyResume.battery / 1000).toFixed(2)} kW
               </Text>
             </View>
-            <Feather name={getArrowDirection(data.propertyResume.battery, "left")} size={24} color="black" />
+            {/* <Feather name={getArrowDirection(data.propertyResume.battery, "left")} size={24} color="#10B981" /> */}
+            <DottedLine
+              style={{ top: 15, left: 40, position: "absolute" }}
+              length={50}
+              dotSize={10}
+              dotColor="#10B981"
+              reverse={data.propertyResume.battery > 0}
+              direction="horizontal"
+              duration={3000}
+            />
           </View>
         </View>
       </View>
@@ -94,20 +117,15 @@ const styles = StyleSheet.create({
     width: width / 2.7,
     padding: 5,
     maxHeight: 140,
-    height: 140,
+    height: 200,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "transparent",
     borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   container: {
     width: width / 2 - 20,
-    height: 140,
+    height: 160,
     justifyContent: "center",
     alignItems: "center",
     transform: [{ scale: 0.8 }],
@@ -115,7 +133,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 12,
     fontWeight: "500",
-    color: "#4B5563",
+    color: "white",
   },
   animatedText: {
     opacity: 0.7,
@@ -153,13 +171,22 @@ const styles = StyleSheet.create({
   rightText: {
     position: "absolute",
     top: 40,
-    right: -8,
+    right: 5,
   },
-  bottomText: {},
+  bottomText: {
+    backgroundColor: "#083344",
+    padding: 5,
+    borderRadius: 8,
+    fontSize: 17,
+    fontWeight: "500",
+    position: "absolute",
+    top: 8,
+    left: 48,
+  },
   leftText: {
     position: "absolute",
     top: 40,
-    left: 0,
+    left: -3,
   },
 });
 

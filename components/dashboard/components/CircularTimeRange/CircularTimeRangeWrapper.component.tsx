@@ -3,8 +3,8 @@ import { Dimensions, View, StyleSheet, Text } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import CircularTimeRange from "./CircularTimeRange.component";
 import { Colors, TimeSlot } from "../../utils/circularTimeRangeUtils";
-import { Modal } from "react-native-paper";
-
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 const LegendItem = ({ color, label }: { color: string; label: string }) => (
   <View style={styles.legendItem}>
     <View style={[styles.colorDot, { backgroundColor: color }]} />
@@ -21,18 +21,78 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
       <View style={styles.legendContainer}>
         {type === "energy" ? (
           <>
-            <LegendItem color={Colors.LOW} label="€" />
-            <LegendItem color={Colors.MODERATE} label="€€" />
-            <LegendItem color={Colors.STANDARD} label="€€€" />
-            <LegendItem color={Colors.HIGH} label="€€€€" />
-            <LegendItem color={Colors.CRITICAL} label="€€€€€" />
+            <LegendItem color={Colors.MODERATE} label="<0.05€" />
+            <LegendItem color={Colors.STANDARD} label="<0.10€" />
+            <LegendItem color={Colors.HIGH} label=">0.18€" />
+            <LegendItem color={Colors.CRITICAL} label=">0.23€" />
+
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "baseline",
+                width: 100,
+                position: "absolute",
+                right: "50%",
+                bottom: 0,
+                backgroundColor: "#083344",
+                padding: 5,
+                borderRadius: 8,
+                gap: 5,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "500",
+                  color: "#DBFFE8",
+                  marginBottom: 2,
+                  textAlign: "center",
+                }}
+              >
+                € Energía
+              </Text>
+              <FontAwesome6 name="plug-circle-exclamation" size={20} color="#10B981" />
+            </View>
           </>
         ) : (
           <>
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_NONE} label="€" />
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_LOW} label="€€" />
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_MODERATE} label="€€€" />
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_HIGH} label="€€€€" />
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_NONE} label="=0.00€" />
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_LOW} label="<0.04€" />
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_MODERATE} label="<0.08€" />
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_HIGH} label=">0.08€" />
+
+            <View
+              style={{
+                flexWrap: "nowrap",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "baseline",
+                width: 100,
+                position: "absolute",
+                right: "50%",
+                bottom: 0,
+                backgroundColor: "#083344",
+                padding: 5,
+                borderRadius: 8,
+                gap: 5,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "500",
+                  color: "#DBFFE8",
+                  marginBottom: 2,
+                  textAlign: "center",
+                }}
+              >
+                € Excedentes
+                <MaterialIcons name="solar-power" size={24} color="#10B981" />
+              </Text>
+            </View>
           </>
         )}
       </View>
@@ -65,6 +125,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   legendLabel: {
+    color: "#DBFFE8",
     fontSize: 12,
   },
 });

@@ -96,8 +96,8 @@ export const analyzeEnergyPrices = (energyPrices: EnergyPrice[]): TimeSlot[] => 
   return [
     ...consolidateSlots(slots.critical, Colors.CRITICAL, AdviceType.CRITICAL),
     ...consolidateSlots(slots.high, Colors.HIGH, AdviceType.HIGH),
-    ...consolidateSlots(slots.moderate, Colors.MODERATE, AdviceType.MODERATE),
-    ...consolidateSlots(slots.low, Colors.LOW, AdviceType.LOW),
+    ...consolidateSlots(slots.moderate, Colors.STANDARD, AdviceType.MODERATE),
+    ...consolidateSlots(slots.low, Colors.MODERATE, AdviceType.LOW),
   ];
 };
 

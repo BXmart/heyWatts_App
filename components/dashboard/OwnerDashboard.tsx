@@ -30,7 +30,6 @@ const OwnerDashboard = ({
 }) => {
   const { user, isLoading } = useAuthStore();
   const [invoiceData, setInvoiceData] = useState<InvoiceData>();
-  const { currentDate, setCurrentDate } = useDashboard();
   const energySlots = analyzeEnergyPrices(marketPrices);
   const compSlots = analyzeCompPrices(compensationPrices);
 
@@ -61,9 +60,8 @@ const OwnerDashboard = ({
         <PropertyInfograph data={dashboardData} hasBattery={true} hasInverter={true} />
         <CircularTimeRangesSwiper energySlots={energySlots} compSlots={compSlots} />
       </View>
-      {/* <TopSwiperCards data={dashboardData} hasMeterDevices={true} /> */}
-      <DashboardGraph dashboardData={dashboardData} initialData={consumptionData} currentProperty={currentProperty} />
-      <MarketPriceGraphs data={dashboardData} energyPrice={marketPrices} energyCompPrice={marketPrices.energyCompPrice} currentDate={currentDate} setCurrentDate={setCurrentDate} />
+      {<TopSwiperCards data={dashboardData} hasMeterDevices={true} />}
+      <DashboardGraph dashboardData={dashboardData} initialData={consumptionData} currentProperty={currentProperty} marketPrices={marketPrices} />
     </ScrollView>
   );
 };

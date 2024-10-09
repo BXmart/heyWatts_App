@@ -2,9 +2,6 @@ import { useState, useEffect, useCallback, SetStateAction, Dispatch } from 'reac
 import { getDashboardConsumptionAndPredictionGraph, getEnergyPricesByPropertyId } from "@/services/dashboard.service";
 import moment from "moment";
 import parseDashboardData, { DashboardData, GraphType, ParsedDataItem } from "@/components/dashboard/utils/parseDashboardData";
-import { validatePathConfig } from '@react-navigation/native';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
-import { ConsumptionGraphData } from '@/types/OwnerDashboard';
 
 interface DashboardHookResult {
   parsedEnergyData: ParsedDataItem[];
@@ -67,8 +64,6 @@ const useDashboard = (): DashboardHookResult => {
       const parsedEnergyData = parseDashboardData(energyData, GraphType.Energy);
       const parsedMoneyData = parseDashboardData(energyData, GraphType.Money);
 
-      console.log({ energyData })
-      console.log({ moneyData })
       setEnergyData(energyData);
       setMoneyData(moneyData);
       setParsedEnergyData(parsedEnergyData.parsedData);

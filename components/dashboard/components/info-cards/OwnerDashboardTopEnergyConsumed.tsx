@@ -85,6 +85,8 @@ const styles = StyleSheet.create({
     height: 140,
     padding: 16,
     position: "relative",
+    backgroundColor: "transparent",
+    shadowColor: "transparent",
   },
   headerText: {
     fontSize: 14,

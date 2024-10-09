@@ -47,9 +47,9 @@ const generateHourLines = (cx: number, cy: number, radius: number): React.ReactN
     const [labelX, labelY] = polarToCartesian(cx, cy, radius - 20, angle);
     hourLines.push(
       <React.Fragment key={i}>
-        <Line x1={startX} y1={startY} x2={endX} y2={endY} stroke="#e5e7eb" strokeWidth="2" strokeLinecap="round" />
+        <Line x1={startX} y1={startY} x2={endX} y2={endY} stroke="#DBFFE8" strokeWidth="2" strokeLinecap="round" />
         {i % 2 === 0 && (
-          <SvgText x={labelX} y={labelY} textAnchor="middle" alignmentBaseline="middle" fontSize="8" fill="#4A5568">
+          <SvgText x={labelX} y={labelY} textAnchor="middle" alignmentBaseline="middle" fontSize="11" fill="#DBFFE8">
             {i}
           </SvgText>
         )}
@@ -86,7 +86,7 @@ const CircularTimeRange: React.FC<CircularTimeRangeProps> = ({ slots, options, s
         {drawSlots()}
       </Svg>
       <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "center", alignItems: "center" }}>
-        <Image source={require("@/assets/branding/hw-iso-hor-color-01.png")} style={{ height: 48, width: 48 }} resizeMode="contain" />
+        <Image source={require("@/assets/branding/hw-iso-hor-green-01.png")} style={{ height: 48, width: 48 }} resizeMode="contain" />
       </View>
     </View>
   );
