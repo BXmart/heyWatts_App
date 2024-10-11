@@ -81,7 +81,7 @@ const CircularTimeRange: React.FC<CircularTimeRangeProps> = ({ slots, options, s
   return (
     <View style={[{ width, height, position: "relative" }, style]}>
       <Svg width={width} height={height} viewBox={`15 15 ${width - 30} ${height - 30}`}>
-        <Circle cx={width / 2} cy={height / 2} r={width / 2 - 50} fill="none" stroke="#e5e7eb" strokeWidth={4} />
+        {/* <Circle cx={width / 2} cy={height / 2} r={width / 2 - 50} fill="none" stroke="black" strokeWidth={4} /> */}
         {generateHourLines(width / 2, height / 2, width / 2 - 50)}
         {drawSlots()}
       </Svg>

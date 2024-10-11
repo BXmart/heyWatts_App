@@ -11,6 +11,7 @@ import { AntDesign } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
 
 export default function HomeLayout() {
   const { user, isLoading } = useAuthStore();
@@ -48,13 +49,14 @@ export default function HomeLayout() {
             fontWeight: "bold",
             fontSize: 23,
           },
+          tabBarActiveBackgroundColor: "#035170",
           tabBarIcon: ({ color }) => <MaterialIcons name="space-dashboard" size={24} color="#DBFFE8" />,
           tabBarLabelStyle: {
             color: "#DBFFE8",
           },
           headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color="#DBFFE8" />}</Pressable>
+            <Link href="/modal" asChild style={{ paddingRight: 15 }}>
+              <Pressable>{({ pressed }) => <Feather name="settings" size={24} color="#DBFFE8" />}</Pressable>
             </Link>
           ),
         }}
@@ -73,13 +75,14 @@ export default function HomeLayout() {
             fontWeight: "bold",
             fontSize: 23,
           },
+          tabBarActiveBackgroundColor: "#035170",
           tabBarIcon: ({ color }) => <FontAwesome6 name="house-chimney" size={24} color="#DBFFE8" />,
           tabBarLabelStyle: {
             color: "#DBFFE8",
           },
           headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color="#DBFFE8" />}</Pressable>
+            <Link href="/modal" asChild style={{ paddingRight: 15 }}>
+              <Pressable>{({ pressed }) => <Feather name="settings" size={24} color="#DBFFE8" />}</Pressable>
             </Link>
           ),
         }}
@@ -98,13 +101,14 @@ export default function HomeLayout() {
             fontWeight: "bold",
             fontSize: 23,
           },
+          tabBarActiveBackgroundColor: "#035170",
           tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color="#DBFFE8" />,
           tabBarLabelStyle: {
             color: "#DBFFE8",
           },
           headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>{({ pressed }) => <AntDesign name="user" size={24} color="#DBFFE8" />}</Pressable>
+            <Link href="/modal" asChild style={{ paddingRight: 15 }}>
+              <Pressable>{({ pressed }) => <Feather name="settings" size={24} color="#DBFFE8" />}</Pressable>
             </Link>
           ),
         }}

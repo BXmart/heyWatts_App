@@ -7,7 +7,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 const LegendItem = ({ color, label }: { color: string; label: string }) => (
   <View style={styles.legendItem}>
-    <View style={[styles.colorDot, { backgroundColor: color }]} />
+    <View style={[styles.colorDot, { backgroundColor: color, borderColor: "lightgray", borderWidth: 1 }]} />
     <Text style={styles.legendLabel}>{label}</Text>
   </View>
 );
@@ -31,7 +31,7 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "center",
-                alignItems: "baseline",
+                alignItems: "center",
                 width: 100,
                 position: "absolute",
                 right: "50%",
@@ -58,18 +58,18 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
           </>
         ) : (
           <>
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_NONE} label="=0.00€" />
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_LOW} label="<0.04€" />
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_MODERATE} label="<0.08€" />
-            <LegendItem color={Colors.SURPLUS_COMPENSATION_HIGH} label=">0.08€" />
-
+            <View style={{ padding: 5 }}>
+              <LegendItem color={Colors.SURPLUS_COMPENSATION_NONE} label="=0.00€" />
+              <LegendItem color={Colors.SURPLUS_COMPENSATION_LOW} label="<0.04€" />
+              <LegendItem color={Colors.SURPLUS_COMPENSATION_MODERATE} label="<0.08€" />
+              <LegendItem color={Colors.SURPLUS_COMPENSATION_HIGH} label=">0.08€" />
+            </View>
             <View
               style={{
-                flexWrap: "nowrap",
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "center",
-                alignItems: "baseline",
+                alignItems: "center",
                 width: 100,
                 position: "absolute",
                 right: "50%",
@@ -90,8 +90,8 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
                 }}
               >
                 € Excedentes
-                <MaterialIcons name="solar-power" size={24} color="#10B981" />
               </Text>
+              <MaterialIcons name="solar-power" size={24} color="#10B981" />
             </View>
           </>
         )}

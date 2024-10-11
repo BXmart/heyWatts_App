@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Dimensions, Text, View, StyleSheet } from "react-native";
-
 import { Card } from "@/components/ui/Card";
 import useDashboard from "@/hooks/useDashboardHook";
 import { BarColors, GraphType } from "../utils/parseDashboardData";
@@ -11,6 +10,7 @@ import EnergyMoneyResume from "./components/EnergyMoneyResume";
 import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
 import MarketPriceGraphs from "./MarketGraph";
 import { BarChart, LineChart } from "react-native-gifted-charts";
+import { Colors } from "../utils/circularTimeRangeUtils";
 
 const { width } = Dimensions.get("window");
 
@@ -50,31 +50,48 @@ const DashboardGraph = React.memo(
     const minValue = Math.min(...currentData.map((item) => item.value), ...parsedEnergyPredictionData.map((item) => item.value));
 
     const renderTooltip = (item: any) => {
+      console.log({ item });
       return (
         <View style={styles.tooltip}>
           <Text style={styles.tooltipText}>{`${item.label}:00`}</Text>
           <Text style={styles.tooltipText}>
-            Precio de la luz: <Text style={styles.boldText}>{item.value.toFixed(3)}€/kWh</Text>
+            {item.frontColor === "#4bbc96" ? (graphType == GraphType.Money ? "Importe Volcado:" : "Energía Volcada:") : graphType == GraphType.Money ? "Importe Consumido:" : "Energía Consumida:"}
+            <Text style={styles.boldText}>
+              {item.value.toFixed(3)}
+              {graphType == GraphType.Money ? "€/" : ""}kWh
+            </Text>
           </Text>
-          <Text style={styles.tooltipText}>
+          {/* <Text style={styles.tooltipText}>
             Predicción de consumo: <Text style={styles.boldText}>{item.value.toFixed(3)}€/kWh</Text>
-          </Text>
+          </Text> */}
         </View>
       );
     };
 
-    const Legend = () => (
+    const Legend = ({ graphType }: { graphType: number }) => (
       <View style={styles.legendContainer}>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendColor, { backgroundColor: BarColors.red }]} />
-          <View style={[styles.legendColor, { backgroundColor: BarColors.orange }]} />
-          <View style={[styles.legendColor, { backgroundColor: BarColors.green }]} />
-          <Text style={styles.legendText}>Actual</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendColor, { backgroundColor: "#F29C6E" }]} />
-          <Text style={styles.legendText}>Predicción</Text>
-        </View>
+        {graphType == GraphType.Energy && (
+          <>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: BarColors.red }]} />
+              <View style={[styles.legendColor, { backgroundColor: BarColors.orange }]} />
+              <View style={[styles.legendColor, { backgroundColor: BarColors.green }]} />
+              <Text style={styles.legendText}>Actual</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: "#F29C6E" }]} />
+              <Text style={styles.legendText}>Predicción</Text>
+            </View>
+          </>
+        )}
+        {graphType == GraphType.Money && (
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: Colors.MODERATE }]} />
+            <Text style={styles.legendText}>Consumida</Text>
+            <View style={[styles.legendColor, { backgroundColor: Colors.SURPLUS_COMPENSATION_MODERATE }]} />
+            <Text style={styles.legendText}>Volcada</Text>
+          </View>
+        )}
       </View>
     );
 
@@ -86,8 +103,7 @@ const DashboardGraph = React.memo(
       <View style={styles.container}>
         <Card style={styles.card}>
           <View style={styles.headerContainer}>
-            <Text style={styles.title}>Consumos</Text>
-            <Text style={styles.date}>{currentDate}</Text>
+            <Text style={styles.title}>Energía diaria</Text>
             <View style={styles.segmentedControl}>
               {["€", "kWh"].map((value, index) => (
                 <TouchableOpacity key={index} style={[styles.segment, graphType === index && styles.selectedSegment]} onPress={() => setGraphType(index)}>
@@ -118,8 +134,9 @@ const DashboardGraph = React.memo(
                 barWidth={22}
                 barBorderRadius={5}
                 xAxisIndicesWidth={1}
-                yAxisThickness={0}
-                xAxisThickness={0}
+                yAxisColor={"white"}
+                yAxisThickness={1}
+                xAxisThickness={1}
                 xAxisLabelTextStyle={{ color: "gray" }}
                 yAxisLabelWidth={20}
                 dashWidth={20}
@@ -144,7 +161,7 @@ const DashboardGraph = React.memo(
                 }}
                 lineData={parsedEnergyPredictionData}
               />
-              {graphType === GraphType.Energy && <Legend />}
+              <Legend graphType={graphType} />
             </>
           )}
           <View style={styles.navigationContainer}>
@@ -153,6 +170,7 @@ const DashboardGraph = React.memo(
                 <Octicons name="chevron-left" size={24} color="black" />
               </View>
             </TouchableOpacity>
+            <Text style={styles.date}>Día: {currentDate}</Text>
             <TouchableOpacity onPress={handleNextDay} disabled={graphType == GraphType.Money ? new Date(currentDate) >= TODAY : false} activeOpacity={0}>
               <View style={styles.navButtonRight}>
                 <Octicons name="chevron-right" size={24} color="black" />
@@ -305,6 +323,7 @@ const styles = StyleSheet.create({
   legendItem: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 5,
     marginHorizontal: 10,
   },
   legendColor: {
