@@ -160,3 +160,6 @@ export const INSTALLATIONS_STATUS = {
 } as const;
 
 export const TOKEN_EXPIRATION_TIME = 1000 * 60;
+
+
+export const INTERVAL_TIME = 180000

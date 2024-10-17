@@ -1,83 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
+import React from "react";
+import { View, Text } from "react-native";
 import { Redirect } from "expo-router";
 import { ROLES, URLS } from "@/utils/constants";
 import OwnerDashboard from "@/components/dashboard/OwnerDashboard";
 import AdminDashboard from "@/components/dashboard/AdminDashboard";
 import InstallerDashboard from "@/components/dashboard/InstallerDashboard";
 import useAuthStore from "@/stores/useAuthStore";
-import { getEnergyCompensationPricesByPropertyId, getPagesPropertiesByUserId, getPropertyDetailsById } from "@/services/properties.service";
-import { getDashboardConsumptionAndPredictionGraph, getEnergyPricesByPropertyId, getOwnerDashboard, getOwnerInvoice } from "@/services/dashboard.service";
-import moment from "moment";
-import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
-import { DetailPropertyI } from "@/types/DetailProperty";
+import { useTabsContext } from "./context/TabsContext";
+import PropertySelector from "@/components/common/PropertySelector.component";
 
 export interface PropertyI {
   _id: string;
   name: string;
   description: string;
 }
-export interface PagedPropertiesResponseI {
-  content: PropertyI[];
-  pageNo: number;
-  pageSize: number;
-  totalElements: number;
-  totalPages: number;
-  last: boolean;
-}
 
 export default function Dashboard() {
+  const { dashboardData, consumptionData, properties, marketPrices, compensationPrices } = useTabsContext();
   const { user, isLoading } = useAuthStore();
-  const [currentProperty, setCurrentProperty] = useState(user!.user.propertyByDefault?._id ?? undefined);
-  const [dashboardData, setDashboardData] = useState<any>([]);
-  const [consumptionData, setConsumptionData] = useState<any>([]);
-  const [properties, setProperties] = useState<PagedPropertiesResponseI>();
-  const [marketPrices, setMarketPrices] = useState<any>([]);
-  const [compensationPrices, setCompensationPrices] = useState<any>([]);
-
-  useEffect(() => {
-    if (user && user!.user.propertyByDefault?._id) {
-      initialize()
-        .then(([dashboardData, propertyDetails, properties, consumptionData, marketPrices, compensationPrices]) => {
-          setDashboardData(dashboardData as OwnerDashboardI);
-          setCurrentProperty((propertyDetails as DetailPropertyI)._id);
-          setProperties(properties);
-          setConsumptionData(consumptionData as EnergyDayPriceI[]);
-          setMarketPrices(marketPrices);
-          setCompensationPrices(compensationPrices);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }, [user]);
-
-  const initialize = async () => {
-    return await Promise.all([
-      getOwnerDashboard(user!.user.propertyByDefault?._id!),
-      getPropertyDetailsById(user!.user.propertyByDefault?._id!),
-      getPagesPropertiesByUserId({ userId: user!.user._id, pageSize: "50" }),
-      getDashboardConsumptionAndPredictionGraph({ propertyId: user!.user.propertyByDefault?._id!, date: moment(new Date().setHours(0, 0, 0, 0)).format("YYYY-MM-DD HH:mm:ss") }),
-      getEnergyPricesByPropertyId(user!.user.propertyByDefault?._id!, moment(new Date().setHours(0, 0, 0, 0)).format("YYYY-MM-DD HH:mm:ss")),
-      getEnergyCompensationPricesByPropertyId(user!.user.propertyByDefault?._id!, moment(new Date().setHours(0, 0, 0, 0)).format("YYYY-MM-DD HH:mm:ss")),
-    ]);
-  };
-
-  if (!properties) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...Properties</Text>
-      </View>
-    );
-  }
-
-  const propertiesList = properties!.content.map((property: any) => ({ id: property._id, value: property._id, label: property.name }));
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View className="flex-1 items-center justify-center bg-deep-blue">
+        <Text className="text-mint-green">Loading...</Text>
       </View>
     );
   }
@@ -87,73 +32,14 @@ export default function Dashboard() {
   }
 
   return (
-    <View style={styles.container}>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={propertiesList}
-        search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder={"Sectiona una propiedad"}
-        searchPlaceholder="Search..."
-        value={currentProperty}
-        onChange={(item) => {
-          setCurrentProperty(item.value);
-        }}
-      />
+    <View className="flex-1 p-5 bg-background-default">
+      <PropertySelector />
 
       {user.user.type === ROLES.OWNER && (
-        <OwnerDashboard
-          consumptionData={consumptionData}
-          dashboardData={dashboardData}
-          properties={properties}
-          marketPrices={marketPrices}
-          currentProperty={currentProperty}
-          setCurrentProperty={setCurrentProperty}
-          compensationPrices={compensationPrices}
-        />
+        <OwnerDashboard consumptionData={consumptionData} dashboardData={dashboardData} properties={properties} marketPrices={marketPrices} compensationPrices={compensationPrices} />
       )}
       {user.user.type === ROLES.ADMIN && <AdminDashboard />}
       {user.user.type === ROLES.INSTALLER && <InstallerDashboard />}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#0F242A",
-  },
-  dropdown: {
-    height: 50,
-    width: "50%",
-    borderColor: "#DBFFE8",
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-    color: "#DBFFE8",
-  },
-  placeholderStyle: {
-    fontSize: 16,
-    color: "#DBFFE8",
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-    color: "#DBFFE8",
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});

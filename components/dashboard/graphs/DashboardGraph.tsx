@@ -15,7 +15,7 @@ import { Colors } from "../utils/circularTimeRangeUtils";
 const { width } = Dimensions.get("window");
 
 const DashboardGraph = React.memo(
-  ({ dashboardData, initialData, currentProperty, marketPrices }: { dashboardData: OwnerDashboardI; initialData: EnergyDayPriceI[]; currentProperty: string | undefined; marketPrices: any }) => {
+  ({ dashboardData, initialData, currentProperty, marketPrices }: { dashboardData: OwnerDashboardI; initialData: EnergyDayPriceI[]; currentProperty: string | null; marketPrices: any }) => {
     const { graphType, parsedEnergyData, parsedEnergyPredictionData, parsedMoneyData, originalEnergyData, originalMoneyData, loading, setGraphType, setCurrentDate, currentDate, setPropertyId } =
       useDashboard();
     const [isPointerShown, setIsPointerShown] = useState(false);

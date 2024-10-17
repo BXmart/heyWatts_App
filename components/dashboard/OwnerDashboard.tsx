@@ -16,19 +16,15 @@ const OwnerDashboard = ({
   dashboardData,
   properties,
   marketPrices,
-  currentProperty,
-  setCurrentProperty,
   compensationPrices,
 }: {
   consumptionData: any;
   dashboardData: any;
   properties: PagedPropertiesResponseI;
   marketPrices: any;
-  currentProperty: string | undefined;
-  setCurrentProperty: Dispatch<SetStateAction<string | undefined>>;
   compensationPrices: any[];
 }) => {
-  const { user, isLoading } = useAuthStore();
+  const { user, isLoading, currentProperty, setCurrentProperty } = useAuthStore();
   const [invoiceData, setInvoiceData] = useState<InvoiceData>();
   const energySlots = analyzeEnergyPrices(marketPrices);
   const compSlots = analyzeCompPrices(compensationPrices);

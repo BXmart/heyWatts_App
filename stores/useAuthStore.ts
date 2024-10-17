@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import { UserContextT } from "@/types/UserContext";
 import { router } from "expo-router";
 import { z } from 'zod';
+import { PropertyI } from '@/app/(home)';
 
 const RegisterSchema = z.object({
   nombre: z.string(),
@@ -51,6 +52,7 @@ interface AuthState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
+  currentProperty: string | null;
 }
 
 interface AuthActions {
@@ -58,6 +60,7 @@ interface AuthActions {
   login: (email: string, password: string) => Promise<void>;
   register: (formData: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  setCurrentProperty: (propertyId: string) => void;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -68,12 +71,16 @@ const useAuthStore = create<AuthStore>((set, get) => ({
   isLoading: true,
   error: null,
   loading: true,
+  currentProperty: null,
+  setCurrentProperty: (propertyId: string) => {
+    set({ currentProperty: propertyId });
+  },
   initialize: async () => {
     try {
       const userJson = await SecureStore.getItemAsync('userInfo');
       if (userJson) {
         const user = JSON.parse(userJson) as UserContextT;
-        set({ user, token: user.token, isLoading: false });
+        set({ user, token: user.token, isLoading: false, currentProperty: user!.user.propertyByDefault?._id ?? undefined });
       } else {
         set({ isLoading: false });
       }
@@ -103,7 +110,6 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       set({ error: error.response?.data?.message || 'Registration failed', isLoading: false });
     }
   },
-
   logout: async () => {
     await SecureStore.deleteItemAsync('userInfo');
     set({ user: null, token: null });

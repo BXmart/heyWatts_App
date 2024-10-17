@@ -42,6 +42,7 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
   if (hasBattery && hasInverter) {
     return (
       <View style={styles.card}>
+        <Text style={{ color: "white" }}>Resumen propiedad</Text>
         <View style={styles.container}>
           <IconHouse />
           {/* TOP */}

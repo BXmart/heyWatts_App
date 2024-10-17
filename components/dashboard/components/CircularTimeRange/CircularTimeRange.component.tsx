@@ -17,8 +17,8 @@ interface CircularTimeRangeProps {
 
 const DEFAULT_OPTIONS: Required<CircularTimeRangeOptions> = {
   stepMins: 15,
-  width: 200,
-  height: 200,
+  width: 210,
+  height: 210,
 };
 
 const polarToCartesian = (cx: number, cy: number, radius: number, angle: number): [number, number] => {

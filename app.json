@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/branding/hw-iso-hor-color-01.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#2A434D"
     },
     "ios": {

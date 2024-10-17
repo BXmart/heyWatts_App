@@ -21,11 +21,6 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
       <View style={styles.legendContainer}>
         {type === "energy" ? (
           <>
-            <LegendItem color={Colors.MODERATE} label="<0.05€" />
-            <LegendItem color={Colors.STANDARD} label="<0.10€" />
-            <LegendItem color={Colors.HIGH} label=">0.18€" />
-            <LegendItem color={Colors.CRITICAL} label=">0.23€" />
-
             <View
               style={{
                 display: "flex",
@@ -34,8 +29,8 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
                 alignItems: "center",
                 width: 100,
                 position: "absolute",
-                right: "50%",
-                bottom: 0,
+                right: 20,
+                top: 0,
                 backgroundColor: "#083344",
                 padding: 5,
                 borderRadius: 8,
@@ -55,25 +50,22 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
               </Text>
               <FontAwesome6 name="plug-circle-exclamation" size={20} color="#10B981" />
             </View>
+            <LegendItem color={Colors.MODERATE} label="<0.05€" />
+            <LegendItem color={Colors.STANDARD} label="<0.10€" />
+            <LegendItem color={Colors.HIGH} label=">0.18€" />
+            <LegendItem color={Colors.CRITICAL} label=">0.23€" />
           </>
         ) : (
           <>
-            <View style={{ padding: 5 }}>
-              <LegendItem color={Colors.SURPLUS_COMPENSATION_NONE} label="=0.00€" />
-              <LegendItem color={Colors.SURPLUS_COMPENSATION_LOW} label="<0.04€" />
-              <LegendItem color={Colors.SURPLUS_COMPENSATION_MODERATE} label="<0.08€" />
-              <LegendItem color={Colors.SURPLUS_COMPENSATION_HIGH} label=">0.08€" />
-            </View>
             <View
               style={{
-                display: "flex",
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
-                width: 100,
+                width: 130,
                 position: "absolute",
-                right: "50%",
-                bottom: 0,
+                right: 20,
+                top: 0,
                 backgroundColor: "#083344",
                 padding: 5,
                 borderRadius: 8,
@@ -93,6 +85,11 @@ const CircularTimeRangeWrapper = ({ slots, type }: { slots: TimeSlot[]; type: "e
               </Text>
               <MaterialIcons name="solar-power" size={24} color="#10B981" />
             </View>
+
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_NONE} label="=0.00€" />
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_LOW} label="<0.04€" />
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_MODERATE} label="<0.08€" />
+            <LegendItem color={Colors.SURPLUS_COMPENSATION_HIGH} label=">0.08€" />
           </>
         )}
       </View>
@@ -104,6 +101,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "row",
+    justifyContent: "space-between",
   },
   circularTimeRangeContainer: {
     flex: 2,
@@ -114,15 +112,17 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   legendItem: {
+    alignSelf: "flex-end",
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 5,
+    right: 10,
   },
   colorDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    marginRight: 8,
+    marginRight: 3,
   },
   legendLabel: {
     color: "#DBFFE8",

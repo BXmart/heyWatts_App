@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import useAuthStore from "@/stores/useAuthStore";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
+import "../styles/global.css";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {

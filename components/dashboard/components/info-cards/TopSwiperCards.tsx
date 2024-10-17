@@ -111,7 +111,7 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
       <Modal isVisible={visibleHelp.isOpen} onBackdropPress={() => setVisibleHelp({ isOpen: false, data: null })} style={styles.modal}>
         {renderModalContent()}
       </Modal>
-      <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={true} indicatorStyle="white">
         {/*  {(hasMeterDevices || hasBattery || hasInverter) && (
           <View style={styles.slide}>
             <PropertyInfograph data={data} hasBattery={hasBattery} hasInverter={hasInverter} />
