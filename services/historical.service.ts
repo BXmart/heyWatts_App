@@ -33,7 +33,7 @@ export async function getMonthConsumptionHistorical(propertyId: string) {
 
 export async function getDayHistorical(propertyId: string, currentDate: string) {
   const { data } = await axios.get(API_URL.concat(`/api/v1/web/property/${propertyId}/historics`), {
-    params: { CurrentDate: currentDate },
+    headers: { CurrentDate: currentDate },
   });
   return data;
 }

@@ -1,4 +1,4 @@
-import { useTabsContext } from "@/app/(home)/context/TabsContext";
+import { useTabsContext } from "@/context/TabsContext";
 import useAuthStore from "@/stores/useAuthStore";
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";

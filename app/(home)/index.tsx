@@ -6,7 +6,7 @@ import OwnerDashboard from "@/components/dashboard/OwnerDashboard";
 import AdminDashboard from "@/components/dashboard/AdminDashboard";
 import InstallerDashboard from "@/components/dashboard/InstallerDashboard";
 import useAuthStore from "@/stores/useAuthStore";
-import { useTabsContext } from "./context/TabsContext";
+import { useTabsContext } from "../../context/TabsContext";
 import PropertySelector from "@/components/common/PropertySelector.component";
 
 export interface PropertyI {

@@ -50,7 +50,6 @@ const DashboardGraph = React.memo(
     const minValue = Math.min(...currentData.map((item) => item.value), ...parsedEnergyPredictionData.map((item) => item.value));
 
     const renderTooltip = (item: any) => {
-      console.log({ item });
       return (
         <View style={styles.tooltip}>
           <Text style={styles.tooltipText}>{`${item.label}:00`}</Text>

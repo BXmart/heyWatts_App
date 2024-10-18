@@ -18,7 +18,7 @@ import moment from "moment";
 import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
 import { DetailPropertyI } from "@/types/DetailProperty";
 import { View } from "@/components/Themed";
-import { PagedPropertiesResponseI, TabsContextType, TabsProvider } from "./context/TabsContext";
+import { PagedPropertiesResponseI, TabsContextType, TabsProvider } from "../../context/TabsContext";
 import Skeleton from "react-loading-skeleton";
 import LoadingScreen from "@/components/dashboard/components/SkeletonLoader/SkeletonLoader.component";
 
@@ -39,7 +39,6 @@ export default function HomeLayout() {
         .then(([dashboardData, propertyDetails, properties, consumptionData, marketPrices, compensationPrices]) => {
           setDashboardData(dashboardData as OwnerDashboardI);
           setCurrentProperty((propertyDetails as DetailPropertyI)._id);
-          console.log({ properties });
           setProperties(properties);
           setConsumptionData(consumptionData as EnergyDayPriceI[]);
           setMarketPrices(marketPrices);
@@ -73,10 +72,6 @@ export default function HomeLayout() {
     propertiesList,
   };
 
-  useEffect(() => {
-    console.log({ properties });
-  }, [properties]);
-
   if (!properties) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -107,7 +102,6 @@ export default function HomeLayout() {
           name="index"
           options={{
             title: "Dashboard",
-
             headerStyle: {
               shadowColor: "black",
               shadowRadius: 4,

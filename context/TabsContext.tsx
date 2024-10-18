@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react";
 import { OwnerDashboardI, EnergyDayPriceI } from "@/types/OwnerDashboard";
-import { PropertyI } from "..";
+import { PropertyI } from "../app/(home)";
 
 export interface PagedPropertiesResponseI {
   content: PropertyI[];

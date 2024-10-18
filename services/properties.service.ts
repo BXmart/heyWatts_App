@@ -23,3 +23,12 @@ export async function getEnergyCompensationPricesByPropertyId(propertyId: string
   const { data } = await axios.get(url.href);
   return data;
 }
+
+
+export async function getCheckProperty({ userId, propertyId }: { userId: string, propertyId: string }) {
+  if (propertyId === '' || userId === '') {
+    return;
+  }
+  const { data } = await axios.get(API_URL.concat(`/api/v1/web/checkProperty/${userId}?propertyId=${propertyId}`));
+  return data
+}

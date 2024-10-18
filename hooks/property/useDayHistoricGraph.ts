@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 import { getDatesDayHistorical, getDayHistorical } from '@/services/historical.service';
-import { HistoricEchartsI } from '@/types/HistoricEcharts';
 import { SelectOptions } from '@/types/SelectOptions';
 import { fetchNewDayGraphData } from '@/lib/fetchNewDayGraphData';
 import useAuthStore from '@/stores/useAuthStore';
@@ -18,14 +17,13 @@ const initialData = {
   lastDay: '',
 };
 
-
 export const useDayHistoricGraph = () => {
   const { currentProperty } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<HistoricEchartsI>(initialData);
-  const [availableDates, setAvailableDates] = useState<SelectOptions[]>();
+  const [data, setData] = useState<any>(initialData);
+  const [availableDates, setAvailableDates] = useState<SelectOptions[]>([]);
   const [selectedDay, setSelectedDay] = useState('');
-
+  const [availableHours, setAvailableHours] = useState<number[]>([]);
 
   const fetchData = async (day: string) => {
     try {
@@ -34,6 +32,14 @@ export const useDayHistoricGraph = () => {
         const response = await fetchNewDayGraphData(getDayHistorical, currentProperty, day);
         if (response) {
           setData(response);
+          // Extract available hours from the response
+          const uniqueHours = new Set(
+            Object.values(response.totalConsumption).map((item) => {
+              const date = new Date(item[0]);
+              return date.getHours()
+            })
+          );
+          setAvailableHours(Array.from(uniqueHours).sort((a, b) => a - b));
         }
       }
     } catch (error) {
@@ -79,5 +85,5 @@ export const useDayHistoricGraph = () => {
     return () => clearInterval(intervalId);
   }, [selectedDay]);
 
-  return { data, isLoading, availableDates, selectedDay, setSelectedDay };
+  return { data, isLoading, availableDates, selectedDay, setSelectedDay, availableHours };
 };

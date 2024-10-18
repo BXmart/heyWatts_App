@@ -1,13 +1,15 @@
-import { getPropertyDetailsById } from '@/services/properties.service';
+import { getCheckProperty, getPropertyDetailsById } from '@/services/properties.service';
 import useAuthStore from '@/stores/useAuthStore';
-import { INTERVAL_TIME } from '@/utils/constants';
+import { INTERVAL_TIME, ROLES, URLS } from '@/utils/constants';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 export const useProperty = () => {
-  const { currentProperty } = useAuthStore()
+  const { currentProperty, user } = useAuthStore()
   const [propertyDetailsData, setPropertyDetailsData] = useState();
   const [_isLoading, setIsLoading] = useState(false);
   const [_error, setError] = useState(false);
+  const [isPropertyOwner, setIsPropertyOwner] = useState(false);
 
 
   useEffect(() => {
@@ -20,7 +22,6 @@ export const useProperty = () => {
   const fetchPropertyDetailsData = async () => {
     setIsLoading(true);
     try {
-      console.log({ currentProperty })
       if (currentProperty === undefined || currentProperty === null) {
         return null;
       } else {
@@ -40,5 +41,27 @@ export const useProperty = () => {
     fetchPropertyDetailsData();
   };
 
-  return { propertyDetailsData, reloadPropertyData };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!user || !currentProperty) return
+        const data = await getCheckProperty({ userId: user.user._id, propertyId: currentProperty });
+        setIsPropertyOwner(!!data);
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+    fetchData()
+  }, [])
+
+
+  useEffect(() => {
+    if (isPropertyOwner !== null && !isPropertyOwner && user?.user.type === ROLES.OWNER) {
+      return router.navigate(URLS.APP_INDEX);
+    }
+  }, [isPropertyOwner])
+
+
+
+  return { propertyDetailsData, reloadPropertyData, isPropertyOwner };
 };
