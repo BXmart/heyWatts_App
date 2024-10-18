@@ -5,8 +5,6 @@ import CircularTimeRange from "./CircularTimeRange.component";
 import { TimeSlot } from "../../utils/circularTimeRangeUtils";
 import { Modal } from "react-native-paper";
 import CircularTimeRangeWrapper from "./CircularTimeRangeWrapper.component";
-import AnimatedDotsCarousel from "react-native-animated-dots-carousel";
-
 const CircularTimeRangesSwiper = ({ energySlots, compSlots }: { energySlots: TimeSlot[]; compSlots: TimeSlot[] }) => {
   const width = Dimensions.get("window").width;
   const [index, setIndex] = React.useState<number>(0);

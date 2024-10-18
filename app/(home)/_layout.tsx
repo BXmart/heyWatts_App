@@ -1,4 +1,4 @@
-import { Link, Redirect, Tabs, useRouter } from "expo-router";
+import { Link, Redirect, Stack, Tabs, useNavigation, useRouter } from "expo-router";
 import React, { PropsWithChildren, ReactElement, ReactNode, ReactPortal, useEffect, useState } from "react";
 import { Pressable, useColorScheme } from "react-native";
 import { URLS } from "@/utils/constants";
@@ -39,6 +39,7 @@ export default function HomeLayout() {
         .then(([dashboardData, propertyDetails, properties, consumptionData, marketPrices, compensationPrices]) => {
           setDashboardData(dashboardData as OwnerDashboardI);
           setCurrentProperty((propertyDetails as DetailPropertyI)._id);
+          console.log({ properties });
           setProperties(properties);
           setConsumptionData(consumptionData as EnergyDayPriceI[]);
           setMarketPrices(marketPrices);
@@ -72,9 +73,13 @@ export default function HomeLayout() {
     propertiesList,
   };
 
+  useEffect(() => {
+    console.log({ properties });
+  }, [properties]);
+
   if (!properties) {
     return (
-      <View>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <LoadingScreen />
       </View>
     );
