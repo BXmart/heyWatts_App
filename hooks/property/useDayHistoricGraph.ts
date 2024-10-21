@@ -22,14 +22,14 @@ export const useDayHistoricGraph = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<any>(initialData);
   const [availableDates, setAvailableDates] = useState<SelectOptions[]>([]);
-  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [availableHours, setAvailableHours] = useState<number[]>([]);
 
-  const fetchData = async (day: string) => {
+  const fetchData = async (day: Date) => {
     try {
       setIsLoading(true);
       if (!!day && currentProperty) {
-        const response = await fetchNewDayGraphData(getDayHistorical, currentProperty, day);
+        const response = await fetchNewDayGraphData(getDayHistorical, currentProperty, moment(day).format('yyyy-MM-DD HH:mm:ss'));
         if (response) {
           setData(response);
           // Extract available hours from the response
@@ -55,13 +55,14 @@ export const useDayHistoricGraph = () => {
       setIsLoading(true);
       const response = await getDatesDayHistorical(currentProperty);
       if (response) {
-        const parseDates = response.map((item: string) => ({
-          id: item,
-          value: moment(item).format('yyyy-MM-DD HH:mm:ss'),
-          label: moment(item).format('ll'),
-        }));
+        // const parseDates = response.map((item: string) => ({
+        //   id: item,
+        //   value: moment(item).format('yyyy-MM-DD HH:mm:ss'),
+        //   label: moment(item).format('ll'),
+        // }));
+        const parseDates = response.map((item: string) => new Date(moment(item).format('yyyy-MM-DD HH:mm:ss')));
         setAvailableDates(parseDates);
-        setSelectedDay(parseDates[0].value);
+        setSelectedDay(parseDates[0]);
       }
     } catch (error) {
       console.warn(error);

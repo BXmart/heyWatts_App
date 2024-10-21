@@ -14,7 +14,7 @@ const FeeTypeMoneyConsumResume = ({ data, dateData, currentGraphMode }: { data: 
   const [lastConsumItem, setLastConsumItem] = useState(null);
 
   useEffect(() => {
-    if (data.consumptionList.length && !(dateData && dateData.consumptionData)) {
+    if (data && data.consumptionList && data.consumptionList.length && !(dateData && dateData.consumptionData)) {
       const tempTotalTip = data.consumptionList.reduce((acc, current) => (acc += current.tip > 0 ? current.tip : 0), 0).toFixed(2);
       setTotalTip(tempTotalTip);
       const tempTotalValley = data.consumptionList.reduce((acc, current) => (acc += current.valley > 0 ? current.valley : 0), 0).toFixed(2);

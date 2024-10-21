@@ -19,13 +19,13 @@ export default function Dashboard() {
   const { dashboardData, consumptionData, properties, marketPrices, compensationPrices } = useTabsContext();
   const { user, isLoading } = useAuthStore();
 
-  if (isLoading) {
+  /*   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-deep-blue">
         <Text className="text-mint-green">Loading...</Text>
       </View>
     );
-  }
+  } */
 
   if (!user) {
     return <Redirect href={URLS.SIGN_IN} />;
@@ -36,7 +36,14 @@ export default function Dashboard() {
       <PropertySelector />
 
       {user.user.type === ROLES.OWNER && (
-        <OwnerDashboard consumptionData={consumptionData} dashboardData={dashboardData} properties={properties} marketPrices={marketPrices} compensationPrices={compensationPrices} />
+        <OwnerDashboard
+          consumptionData={consumptionData}
+          dashboardData={dashboardData}
+          properties={properties}
+          marketPrices={marketPrices}
+          compensationPrices={compensationPrices}
+          isLoading={isLoading || !dashboardData || !consumptionData || !properties || !marketPrices || !compensationPrices}
+        />
       )}
       {user.user.type === ROLES.ADMIN && <AdminDashboard />}
       {user.user.type === ROLES.INSTALLER && <InstallerDashboard />}

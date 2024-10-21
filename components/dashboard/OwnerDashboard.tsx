@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import DashboardGraph from "./graphs/DashboardGraph";
 import useAuthStore from "@/stores/useAuthStore";
 import useDashboard from "@/hooks/useDashboardHook";
-import { PagedPropertiesResponseI } from "@/app/(home)";
 import { getOwnerInvoice, InvoiceData } from "@/services/dashboard.service";
-import TopSwiperCards from "./components/info-cards/TopSwiperCards";
+import TopSwiperCards from "./components/InfoCards/TopSwiperCards";
 import MarketPriceGraphs from "./graphs/MarketGraph";
 import { analyzeCompPrices, analyzeEnergyPrices } from "./utils/circularTimeRangeUtils";
 import CircularTimeRangesSwiper from "./components/CircularTimeRange/CircularTimeRangesSwiper.component";
 import PropertyInfograph from "./components/PropertyInfograph";
+import { PagedPropertiesResponseI } from "@/context/TabsContext";
 
 const OwnerDashboard = ({
   consumptionData,
@@ -17,14 +17,16 @@ const OwnerDashboard = ({
   properties,
   marketPrices,
   compensationPrices,
+  isLoading,
 }: {
   consumptionData: any;
   dashboardData: any;
-  properties: PagedPropertiesResponseI;
+  properties: PagedPropertiesResponseI | undefined;
   marketPrices: any;
   compensationPrices: any[];
+  isLoading: boolean;
 }) => {
-  const { user, isLoading, currentProperty, setCurrentProperty } = useAuthStore();
+  const { user, currentProperty, setCurrentProperty } = useAuthStore();
   const [invoiceData, setInvoiceData] = useState<InvoiceData>();
   const energySlots = analyzeEnergyPrices(marketPrices);
   const compSlots = analyzeCompPrices(compensationPrices);
@@ -45,7 +47,7 @@ const OwnerDashboard = ({
   if (isLoading || !user) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...{!user}</Text>
+        <Text>Loading...</Text>
       </View>
     );
   }
@@ -53,7 +55,7 @@ const OwnerDashboard = ({
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
       <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-        <PropertyInfograph data={dashboardData} hasBattery={true} hasInverter={true} />
+        <PropertyInfograph data={dashboardData} hasBattery={true} hasInverter={true} isLoading={isLoading} />
         <CircularTimeRangesSwiper energySlots={energySlots} compSlots={compSlots} />
       </View>
       {<TopSwiperCards data={dashboardData} hasMeterDevices={true} />}

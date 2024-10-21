@@ -20,7 +20,7 @@ import { DetailPropertyI } from "@/types/DetailProperty";
 import { View } from "@/components/Themed";
 import { PagedPropertiesResponseI, TabsContextType, TabsProvider } from "../../context/TabsContext";
 import Skeleton from "react-loading-skeleton";
-import LoadingScreen from "@/components/dashboard/components/SkeletonLoader/SkeletonLoader.component";
+import LoadingScreen from "@/components/common/SkeletonLoader/SkeletonLoader.component";
 
 export default function HomeLayout() {
   const { user, isLoading, setCurrentProperty } = useAuthStore();
@@ -72,16 +72,12 @@ export default function HomeLayout() {
     propertiesList,
   };
 
-  if (!properties) {
+  if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <LoadingScreen />
       </View>
     );
-  }
-
-  if (isLoading) {
-    return <Text>Loading root</Text>;
   }
 
   if (!user) {
@@ -127,7 +123,7 @@ export default function HomeLayout() {
         <Tabs.Screen
           name="property"
           options={{
-            title: "Property",
+            title: "Propiedad",
             headerStyle: {
               shadowColor: "black",
               shadowRadius: 4,

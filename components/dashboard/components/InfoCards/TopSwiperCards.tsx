@@ -51,8 +51,10 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
   };
 
   useEffect(() => {
-    fetch();
-  }, []);
+    if (data?.property?._id) {
+      fetch();
+    }
+  }, [data]);
 
   const renderModalContent = () => (
     <View style={styles.modalContent}>

@@ -27,7 +27,7 @@ const EnergyMoneyResume = React.memo(({ data, dateData, currentGraphMode, showPr
       setEnergyProductionToday(getEnergyProductionToday(dateData.consumptionData));
       setMoneyConsumptionToday(getMoneyConsumptionToday(dateData.consumptionData));
       setMoneyProductionToday(getMoneyProductionToday(dateData.consumptionData));
-    } else if (data.consumptionList.length) {
+    } else if (data && data.consumptionList.length) {
       setEnergyConsumptionToday(getEnergyConsumptionToday(data.consumptionList));
       setEnergyProductionToday(getEnergyProductionToday(data.consumptionList));
       setMoneyConsumptionToday(getMoneyConsumptionToday(data.consumptionList));
@@ -97,12 +97,12 @@ const styles = StyleSheet.create({
   value: {
     fontWeight: "500",
     fontSize: 20,
-    color: "#164E63",
+    color: "#DBFFE8",
   },
   boldValue: {
     fontWeight: "bold",
     fontSize: 20,
-    color: "#164E63",
+    color: "#DBFFE8",
   },
 });
 

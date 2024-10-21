@@ -15,7 +15,7 @@ const IconPylon = () => <MaterialCommunityIcons name="transmission-tower" size={
 const IconPlug = () => <FontAwesome6 name="plug-circle-bolt" size={34} color="#10B981" />;
 const IconBattery = () => <MaterialCommunityIcons name="car-battery" size={34} color="#10B981" />;
 
-const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashboardI; hasBattery: boolean; hasInverter: boolean }) => {
+const PropertyInfograph = ({ data, hasBattery, hasInverter, isLoading }: { data: OwnerDashboardI; hasBattery: boolean; hasInverter: boolean; isLoading: boolean }) => {
   const getArrowDirection = (value: number, position: "up" | "down" | "left" | "right") => {
     if (position === "up") {
       if (value > 0) return "chevrons-up";
@@ -49,8 +49,8 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
           <View style={styles.topSection}>
             <View style={{ flex: 1, flexDirection: "row" }}>
               <IconSolar />
-              <Text style={[styles.text, styles.topText, data.propertyResume.production !== 0 && styles.animatedText]}>
-                {data.propertyResume.production === 0 ? "0" : Math.abs(data.propertyResume.production / 1000).toFixed(2)} kW
+              <Text style={[styles.text, styles.topText, (!isLoading ? data.propertyResume.production ?? 0 : 0) !== 0 && styles.animatedText]}>
+                {!isLoading ? (data.propertyResume.production === 0 ? "0" : Math.abs((!isLoading ? data.propertyResume.production ?? 0 : 0) / 1000).toFixed(2)) : "0"} kW
               </Text>
             </View>
             {/* <Feather name={getArrowDirection(-data.propertyResume.production, "up")} size={24} color="#10B981" /> */}
@@ -59,20 +59,20 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
 
           {/* RIGHT */}
           <View style={styles.rightSection}>
-            {/* <Feather name={getArrowDirection(-data.propertyResume.consumption, "right")} size={24} color="#10B981" /> */}
+            {/* <Feather name={getArrowDirection(-(!isLoading? data.propertyResume.production ?? 0 : 0), "right")} size={24} color="#10B981" /> */}
             <DottedLine
               style={{ top: 15, left: -40, position: "absolute" }}
               length={50}
               dotSize={10}
               dotColor="#10B981"
-              reverse={-data.propertyResume.consumption < 0}
+              reverse={-(!isLoading ? data.propertyResume.production ?? 0 : 0) < 0}
               direction="horizontal"
               duration={3000}
             />
             <View style={{ flex: 1, flexDirection: "row" }}>
               <IconPylon />
-              <Text style={[styles.text, styles.rightText, data.propertyResume.consumption !== 0 && styles.animatedText]}>
-                {data.propertyResume.consumption === 0 ? "0" : Math.abs(data.propertyResume.consumption / 1000).toFixed(2)} kW
+              <Text style={[styles.text, styles.rightText, (!isLoading ? data.propertyResume.production ?? 0 : 0) !== 0 && styles.animatedText]}>
+                {(!isLoading ? data.propertyResume.production ?? 0 : 0) === 0 ? "0" : Math.abs((!isLoading ? data.propertyResume.production ?? 0 : 0) / 1000).toFixed(2)} kW
               </Text>
             </View>
           </View>
@@ -83,7 +83,9 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
             <DottedLine style={{ top: -30, left: 7, position: "absolute" }} length={30} dotSize={10} dotColor="#10B981" reverse={false} direction="vertical" duration={3000} />
             <View style={{ flex: 1, flexDirection: "row" }}>
               <IconPlug />
-              <Text style={[styles.text, styles.bottomText]}>{data.propertyResume.total_consumption === 0 ? "0" : Math.abs(data.propertyResume.total_consumption / 1000).toFixed(2)} kW</Text>
+              <Text style={[styles.text, styles.bottomText]}>
+                {!isLoading ? (data.propertyResume.total_consumption === 0 ? "0" : Math.abs(data.propertyResume.total_consumption / 1000).toFixed(2)) : "0"} kW
+              </Text>
             </View>
           </View>
 
@@ -91,8 +93,8 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
           <View style={styles.leftSection}>
             <View style={{ flex: 1, flexDirection: "row" }}>
               <IconBattery />
-              <Text style={[styles.text, styles.leftText, data.propertyResume.battery !== 0 && styles.animatedText]}>
-                {data.propertyResume.battery === 0 ? "0" : Math.abs(data.propertyResume.battery / 1000).toFixed(2)} kW
+              <Text style={[styles.text, styles.leftText, !isLoading && data.propertyResume.battery !== 0 && styles.animatedText]}>
+                {!isLoading ? (data.propertyResume.battery === 0 ? "0" : Math.abs(data.propertyResume.battery / 1000).toFixed(2)) : "0"} kW
               </Text>
             </View>
             {/* <Feather name={getArrowDirection(data.propertyResume.battery, "left")} size={24} color="#10B981" /> */}
@@ -101,9 +103,10 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter }: { data: OwnerDashb
               length={50}
               dotSize={10}
               dotColor="#10B981"
-              reverse={data.propertyResume.battery > 0}
+              reverse={!isLoading && data.propertyResume.battery > 0}
               direction="horizontal"
               duration={3000}
+              pause={isLoading}
             />
           </View>
         </View>

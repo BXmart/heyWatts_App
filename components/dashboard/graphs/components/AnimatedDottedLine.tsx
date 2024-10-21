@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { View, Animated, StyleSheet } from "react-native";
 
-const MultiDot = ({ style = {}, length = 200, dotSize = 10, dotColor = "red", direction = "horizontal", duration = 2000, reverse = false, numberOfDots = 3 }) => {
+const MultiDot = ({ style = {}, length = 200, dotSize = 10, dotColor = "red", direction = "horizontal", duration = 2000, reverse = false, numberOfDots = 3, isLoading = true }) => {
   const animatedValues = useRef(
     Array(numberOfDots)
       .fill(0)
@@ -51,7 +51,9 @@ const MultiDot = ({ style = {}, length = 200, dotSize = 10, dotColor = "red", di
       transform: [direction === "horizontal" ? { translateX: dotPosition } : { translateY: dotPosition }],
     };
   };
-
+  if (isLoading) {
+    return <View style={[styles.container, containerStyle, style]}></View>;
+  }
   return (
     <View style={[styles.container, containerStyle, style]}>
       {animatedValues.map((value, index) => (

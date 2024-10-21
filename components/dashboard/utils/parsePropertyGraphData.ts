@@ -31,7 +31,8 @@ export function parseData(data: any, dataTypes: string[]): ParsedResult {
         const time24Hour = `${hours}:${minutes}`;
 
         return {
-          value: item[1] || 0,
+          type: dataType,
+          value: item[1] / 1000 || 0,
           label: time24Hour,
           datetime: new Date(item[0]),
           frontColor: dataType === 'productionCleanVat' ? '#00FF00' : '#FF0000',
@@ -48,8 +49,10 @@ export function parseData(data: any, dataTypes: string[]): ParsedResult {
             const hours = date.getHours().toString().padStart(2, '0');
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const time24Hour = `${hours}:${minutes}`;
+
             return {
-              value: attr[1] || 0,
+              type: dataType,
+              value: attr[1] / 1000 || 0,
               label: time24Hour,
               datetime: new Date(attr.datetime),
               frontColor: '#0000FF',
@@ -60,7 +63,5 @@ export function parseData(data: any, dataTypes: string[]): ParsedResult {
       }
     }
   });
-
-  console.log({ result })
   return result;
 }

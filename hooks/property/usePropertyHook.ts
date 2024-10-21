@@ -62,6 +62,14 @@ export const useProperty = () => {
   }, [isPropertyOwner])
 
 
+  useEffect(() => {
+    if (propertyDetailsData == undefined) {
+      reloadPropertyData()
+    }
+  }, [propertyDetailsData])
+
+
+
 
   return { propertyDetailsData, reloadPropertyData, isPropertyOwner };
 };

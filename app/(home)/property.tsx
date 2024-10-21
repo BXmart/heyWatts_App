@@ -1,25 +1,62 @@
-import "react-native-reanimated";
-import { View, Text } from "react-native";
-import useAuthStore from "@/stores/useAuthStore";
-import { Dropdown } from "react-native-element-dropdown";
-import { useTabsContext } from "../../context/TabsContext";
-import { remapProps } from "nativewind";
 import PropertySelector from "@/components/common/PropertySelector.component";
+import PropertyTopTabButtons from "@/components/common/PropertyTopTabButtons.component";
+import DevicesList from "@/components/property/components/DevicesList.component";
+import PropertyGraph from "@/components/property/components/PropertyGraph";
 import { useProperty } from "@/hooks/property/usePropertyHook";
-import { useEffect } from "react";
+import useAuthStore from "@/stores/useAuthStore";
 import { ROLES } from "@/utils/constants";
-import PropertyGraph from "@/components/dashboard/graphs/PropertyGraph";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 
-export default function Dashboard() {
+const tabs = [
+  { id: "propertyGraph", label: "Gráfica consumos" },
+  { id: "devices", label: "Dispositivos" },
+];
+
+const PropertyPageSelector = ({ onTabChange }: any) => {
   const { user } = useAuthStore();
-  const { propertyDetailsData, isPropertyOwner } = useProperty();
+  const { isPropertyOwner, propertyDetailsData } = useProperty();
+  const [activeTab, setActiveTab] = useState("propertyGraph");
+
+  const handleTabChange = (tabId: any) => {
+    setActiveTab(tabId);
+  };
+
+  useEffect(() => {}, [propertyDetailsData]);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "propertyGraph":
+        return <PropertyGraph />;
+      case "devices":
+        return <DevicesList propertyDetails={propertyDetailsData} />;
+      default:
+        return <PropertyGraph />;
+    }
+  };
 
   if (isPropertyOwner || (user && user.user.type === ROLES.OWNER)) {
     return (
-      <View className="flex-1 p-5 bg-background-default">
+      <View style={styles.container}>
+        <PropertyTopTabButtons onTabChange={handleTabChange} tabs={tabs} />
         <PropertySelector />
-        <PropertyGraph />
+        <View style={styles.content}>{renderContent()}</View>
       </View>
     );
   }
-}
+
+  return null;
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#083344",
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+});
+
+export default PropertyPageSelector;
