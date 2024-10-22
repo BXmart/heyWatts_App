@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "heyWattsApp",
-    "slug": "heyWattsApp",
+    "name": "heyWatts",
+    "slug": "heyWatts",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/branding/hw-iso-hor-color-01.png",
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/branding/hw-iso-hor-color-01.png",
         "backgroundColor": "#2A434D"
-      }
+      },
+      "package": "com.dwebb1.heyWattsApp"
     },
     "web": {
       "bundler": "metro",
@@ -33,10 +34,23 @@
         {
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
         }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow $(PRODUCT_NAME) to access your device motion."
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f17cdbf1-ea98-4edb-ab7e-6d0dd02b69a3"
+      }
     }
   }
 }
+
+

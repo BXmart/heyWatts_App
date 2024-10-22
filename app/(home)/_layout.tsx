@@ -89,7 +89,7 @@ export default function HomeLayout() {
       <Tabs
         screenOptions={{
           tabBarStyle: {
-            backgroundColor: "#083344",
+            backgroundColor: "#0F242A",
           },
         }}
         backBehavior="history"
@@ -101,7 +101,7 @@ export default function HomeLayout() {
             headerStyle: {
               shadowColor: "black",
               shadowRadius: 4,
-              backgroundColor: "#083344",
+              backgroundColor: "#0F242A",
             },
             headerTitleStyle: {
               color: "#DBFFE8",
@@ -127,7 +127,7 @@ export default function HomeLayout() {
             headerStyle: {
               shadowColor: "black",
               shadowRadius: 4,
-              backgroundColor: "#083344",
+              backgroundColor: "#0F242A",
             },
             headerTitleStyle: {
               color: "#DBFFE8",
@@ -153,7 +153,7 @@ export default function HomeLayout() {
             headerStyle: {
               shadowColor: "black",
               shadowRadius: 4,
-              backgroundColor: "#083344",
+              backgroundColor: "#0F242A",
             },
             headerTitleStyle: {
               color: "#DBFFE8",

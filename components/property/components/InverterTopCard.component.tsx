@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#0F202D",
     padding: 15,
+    borderRadius: 15,
   },
   deviceName: {
     color: "#FFFFFF",

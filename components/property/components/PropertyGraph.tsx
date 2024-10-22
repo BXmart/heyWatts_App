@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef, useReducer } from "react";
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, useWindowDimensions } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { LineChart } from "react-native-gifted-charts";
 import { useDayHistoricGraph } from "@/hooks/property/useDayHistoricGraph";
 import { parseData } from "../../dashboard/utils/parsePropertyGraphData";
 import SignalSelector from "./SignalSelector.component";
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import moment from "moment";
+import Feather from "@expo/vector-icons/Feather";
+import * as ScreenOrientation from "expo-screen-orientation";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CHART_PADDING = 32;
@@ -26,6 +27,17 @@ const PropertyGraph = React.memo(() => {
   const [parsedData, setParsedData] = useState<any[]>([]);
   const scrollRef = useRef(null);
   const [time, setTime] = useState();
+  const [isCompressed, setIsCompressed] = useState(false);
+
+  // Use window dimensions hook for dynamic width/height
+  const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = useWindowDimensions();
+
+  // Calculate if we're in landscape mode
+  const isLandscape = WINDOW_WIDTH > WINDOW_HEIGHT;
+
+  const changeOrientation = async () => {
+    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
+  };
 
   useEffect(() => {
     if (data && data.historicDevices) {
@@ -112,88 +124,337 @@ const PropertyGraph = React.memo(() => {
     }
   };
 
+  const compressData = (data) => {
+    if (!data || data.length === 0) return [];
+
+    // If we're not compressing, return original data
+    if (!isCompressed) return data;
+
+    // First, filter to get only hourly points and sort them
+    const hourlyData = data
+      .filter((point) => {
+        const timeMatch = point.label.match(/(\d{2}):(\d{2})/);
+        if (!timeMatch) return false;
+        const minutes = parseInt(timeMatch[2]);
+        return minutes === 0;
+      })
+      .sort((a, b) => {
+        const hourA = parseInt(a.label.match(/(\d{2}):/)[1]);
+        const hourB = parseInt(b.label.match(/(\d{2}):/)[1]);
+        return hourA - hourB;
+      });
+
+    if (hourlyData.length === 0) return [];
+
+    // Determine if we're looking at today's data
+    const today = new Date();
+    const selectedDate = selectedDay || today;
+    const isToday = selectedDate.toDateString() === today.toDateString();
+
+    // Get start and end hours
+    const startHour = 0;
+    const endHour = isToday ? today.getHours() : 23;
+
+    // Find the start and end points
+    const startPoint = hourlyData.find((point) => {
+      const hour = parseInt(point.label.match(/(\d{2}):/)[1]);
+      return hour === startHour;
+    });
+
+    const endPoint = hourlyData.find((point) => {
+      const hour = parseInt(point.label.match(/(\d{2}):/)[1]);
+      return hour === endHour;
+    });
+
+    // If we don't have both start and end points, return original filtered data
+    if (!startPoint || !endPoint) return hourlyData;
+
+    // We want maximum 8 points including start and end
+    const maxPoints = 8;
+
+    if (hourlyData.length <= maxPoints) {
+      return hourlyData;
+    }
+
+    // Always include start and end points
+    const result = [startPoint];
+
+    // Calculate how many intermediate points we need
+    const intermediatePointsNeeded = maxPoints - 2;
+
+    // Get all points between start and end
+    const intermediatePoints = hourlyData.filter((point) => {
+      const hour = parseInt(point.label.match(/(\d{2}):/)[1]);
+      return hour > startHour && hour < endHour;
+    });
+
+    // Select intermediate points
+    if (intermediatePoints.length > 0) {
+      const step = Math.ceil(intermediatePoints.length / intermediatePointsNeeded);
+
+      for (let i = 0; i < intermediatePoints.length; i += step) {
+        if (result.length < maxPoints - 1) {
+          // -1 to leave room for end point
+          result.push(intermediatePoints[i]);
+        }
+      }
+    }
+
+    // Add the end point
+    result.push(endPoint);
+
+    return result;
+  };
+
+  const processDataForDisplay = useCallback(() => {
+    if (!data || !selectedSignals) return [];
+
+    const auxData = parseData(data, selectedSignals);
+    let dataArray = [];
+
+    // Process each data type
+    if (auxData.positiveConsumption.length > 0) {
+      const index = availableSignals?.findIndex((signal) => signal.value === "positiveConsumption") ?? 0;
+      dataArray.push({
+        data: compressData(auxData.positiveConsumption),
+        color: LineColors[index],
+        label: "Consumo de red electromotriz",
+        value: "positiveConsumption",
+      });
+    }
+
+    if (auxData.negativeConsumption.length > 0) {
+      const index = availableSignals?.findIndex((signal) => signal.value === "negativeConsumption") ?? 1;
+      dataArray.push({
+        data: compressData(auxData.negativeConsumption),
+        color: LineColors[index],
+        label: "Vuelco a red eléctrica",
+        value: "negativeConsumption",
+      });
+    }
+
+    if (auxData.productionCleanVat.length > 0) {
+      const index = availableSignals?.findIndex((signal) => signal.value === "productionCleanVat") ?? 2;
+      dataArray.push({
+        data: compressData(auxData.productionCleanVat),
+        color: LineColors[index],
+        label: "Producción fotovoltaica",
+        value: "productionCleanVat",
+      });
+    }
+
+    if (auxData.totalConsumption.length > 0) {
+      const index = availableSignals?.findIndex((signal) => signal.value === "totalConsumption") ?? 3;
+      dataArray.push({
+        data: compressData(auxData.totalConsumption),
+        color: LineColors[index],
+        label: "Consumo total",
+        value: "totalConsumption",
+      });
+    }
+
+    if (auxData.historicDevices) {
+      const deviceData = Object.keys(auxData.historicDevices).map((key) => {
+        const index = availableSignals?.findIndex((signal) => signal.value === key) ?? 0;
+        return {
+          data: compressData(auxData.historicDevices[key]),
+          color: LineColors[index],
+          label: key,
+          value: key,
+        };
+      });
+      dataArray.push(...deviceData);
+    }
+
+    return dataArray;
+  }, [data, selectedSignals, isCompressed, availableSignals]);
+
+  useEffect(() => {
+    const processedData = processDataForDisplay();
+    setParsedData(processedData);
+  }, [data, selectedSignals, isCompressed]);
+
+  function renderGraph(isLandscape = false) {
+    if (parsedData.length === 0) return null;
+
+    const graphWidth = isLandscape ? WINDOW_WIDTH : isCompressed ? WINDOW_WIDTH : WINDOW_WIDTH * 3;
+
+    const graphHeight = isLandscape ? WINDOW_HEIGHT : WINDOW_HEIGHT * 0.4; // Adjust this value as needed for portrait mode
+
+    return (
+      <View style={styles.graphWrapper}>
+        <LineChart
+          key={`${JSON.stringify(parsedData)}-${isCompressed}-${isLandscape}`}
+          dataSet={parsedData}
+          scrollRef={!isCompressed ? scrollRef : undefined}
+          height={graphHeight / 1.5}
+          width={graphWidth} // Explicitly set width
+          thickness={2}
+          xAxisColor="#DBFFE8"
+          yAxisColor="#DBFFE8"
+          yAxisTextStyle={{ color: "#DBFFE8" }}
+          xAxisLabelTextStyle={{ color: "#DBFFE8" }}
+          yAxisThickness={2}
+          xAxisThickness={2}
+          /* dataPointsColor="#DBFFE8" */
+          hideRules
+          hideDataPoints
+          curved
+          pointerConfig={{
+            activatePointersOnLongPress: true,
+            pointerStripUptoDataPoint: true,
+            pointerStripColor: "lightgray",
+            pointerStripWidth: 2,
+            strokeDashArray: [2, 5],
+            pointerColor: "lightgray",
+            radius: 4,
+            pointerLabelWidth: 100,
+            pointerLabelHeight: 120,
+            pointerLabelComponent: (items) => {
+              return (
+                <View
+                  style={{
+                    height: 120,
+                    width: 200,
+                    backgroundColor: "#282C3E",
+                    borderRadius: 4,
+                    justifyContent: "center",
+                    paddingLeft: 16,
+                    marginTop: -30,
+                    marginLeft: -40,
+                  }}
+                >
+                  {items.map((item, index) => (
+                    <View style={{ flexDirection: "column" }} key={index}>
+                      <Text style={{ color: "lightgray", fontSize: 12 }}>{item.type}</Text>
+                      <Text style={{ color: "white", fontWeight: "bold" }}>{item.value.toFixed(2)} kWh</Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            },
+          }}
+        />
+      </View>
+    );
+  }
+
   if (isLoading) return <ActivityIndicator size="large" color="#164E63" />;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <DateTimePicker testID="datePicker" value={selectedDay ?? new Date()} mode="date" display="default" themeVariant="dark" onChange={onChange} />
-        <DateTimePicker testID="timePicker" value={time ?? new Date()} mode="time" display="default" themeVariant="dark" onChange={onChangeTime} />
-      </View>
-      <View style={styles.graphContainer}>
-        {parsedData.length > 0 && (
-          <LineChart
-            key={JSON.stringify(parsedData)}
-            dataSet={parsedData}
-            scrollRef={scrollRef}
-            thickness={2}
-            xAxisColor="#DBFFE8"
-            yAxisColor="#DBFFE8"
-            yAxisTextStyle={{ color: "#DBFFE8" }}
-            xAxisLabelTextStyle={{ color: "#DBFFE8" }}
-            /*  rulesType="solid"
-            rulesColor="gray" */
-            yAxisThickness={2}
-            xAxisThickness={2}
-            dataPointsColor="#DBFFE8"
-            hideRules
-            pointerConfig={{
-              pointerStripUptoDataPoint: true,
-              pointerStripColor: "lightgray",
-              pointerStripWidth: 2,
-              strokeDashArray: [2, 5],
-              pointerColor: "lightgray",
-              radius: 4,
-              pointerLabelWidth: 100,
-              pointerLabelHeight: 120,
-              pointerLabelComponent: (items) => {
-                console.log({ items });
+    <View style={[styles.mainContainer, isLandscape && styles.landscapeContainer]}>
+      {!isLandscape ? (
+        <>
+          <View style={styles.fixedSection}>
+            <View style={styles.headerRow}>
+              <View style={styles.datePickersContainer}>
+                <DateTimePicker testID="datePicker" value={selectedDay ?? new Date()} mode="date" display="default" themeVariant="dark" onChange={onChange} />
+                <DateTimePicker testID="timePicker" value={time ?? new Date()} mode="time" display="default" themeVariant="dark" onChange={onChangeTime} />
+              </View>
+              <TouchableOpacity style={styles.viewToggle} onPress={() => setIsCompressed(!isCompressed)}>
+                {isCompressed ? <Feather name="maximize-2" size={24} color="black" /> : <Feather name="minimize-2" size={24} color="black" />}
+              </TouchableOpacity>
+            </View>
+          </View>
 
-                return (
-                  <View
-                    style={{
-                      height: 120,
-                      width: 100,
-                      backgroundColor: "#282C3E",
-                      borderRadius: 4,
-                      justifyContent: "center",
-                      paddingLeft: 16,
-                    }}
-                  >
-                    {items.map((item) => (
-                      <View style={{ flexDirection: "column" }} key={item}>
-                        <Text style={{ color: "lightgray", fontSize: 12 }}>{item.type}</Text>
-                        <Text style={{ color: "white", fontWeight: "bold" }}>{items.value} kWh</Text>
-                      </View>
-                    ))}
-                  </View>
-                );
-              },
-            }}
-          />
-        )}
+          {/* Graph container moved outside of fixedSection */}
+          <View style={styles.fullWidthContainer}>{renderGraph()}</View>
 
-        {isLoading && <ActivityIndicator size="large" color="#164E63" style={{ position: "absolute", top: "50%", left: "50%" }} />}
-      </View>
-
-      {availableSignals && <SignalSelector availableSignals={availableSignals} setSelectedSignals={setSelectedSignals} selectedSignals={selectedSignals} lineColors={LineColors} />}
-    </ScrollView>
+          <ScrollView style={styles.scrollSection} contentContainerStyle={styles.scrollContent}>
+            <View style={styles.signalContainer}>
+              {availableSignals && <SignalSelector availableSignals={availableSignals} setSelectedSignals={setSelectedSignals} selectedSignals={selectedSignals} lineColors={LineColors} />}
+            </View>
+          </ScrollView>
+        </>
+      ) : (
+        <View style={styles.landscapeGraphContainer}>{renderGraph(true)}</View>
+      )}
+    </View>
   );
 });
 
 export default PropertyGraph;
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: "column",
-    padding: 16,
+  mainContainer: {
+    flex: 1,
     backgroundColor: "#0F242A",
-    position: "relative",
   },
-  graphContainer: {
-    flexDirection: "column",
+  landscapeContainer: {
+    padding: 0, // Remove padding in landscape mode
+  },
+  fixedSection: {
     backgroundColor: "#0F242A",
-    position: "relative",
+    zIndex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+
+  fullWidthContainer: {
+    marginLeft: -16, // Negative margin to counter parent padding
+    marginRight: -16,
+    backgroundColor: "#0F242A",
+  },
+
+  graphWrapper: {
+    width: SCREEN_WIDTH, // Force full screen width
+    maxHeight: 300,
+    overflow: "hidden", // Prevent content from spilling out
+    backgroundColor: "#083344",
+    borderRadius: 15,
+  },
+
+  graphContainer: {
+    backgroundColor: "#0F242A",
+  },
+
+  landscapeGraphContainer: {
+    flex: 1,
+    backgroundColor: "#0F242A",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%", // Force full width in landscape
+  },
+
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  datePickersContainer: {
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "space-between",
+    marginRight: 16,
+  },
+  viewToggle: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: "#164E63",
+  },
+  scrollSection: {
+    flex: 1,
+    backgroundColor: "#0F242A",
+  },
+  scrollContent: {
+    padding: 16,
+    paddingTop: 0,
+  },
+  signalContainer: {
+    flex: 1,
+  },
+  loader: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 20,
+    textAlign: "center",
   },
   dropdown: {
     height: 50,

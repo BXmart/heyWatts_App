@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { View } from "react-native";
 
 function getStyle(size: string, color: string, noDark?: boolean) {
   const sizeOptions: { [key: string]: string } = {
@@ -27,7 +28,7 @@ const Badge = ({
   color: "white" | "orange" | "red" | "gray" | "green" | "dark" | string;
   noDark?: boolean;
 }) => {
-  return <div className={"rounded-full " + " " + getStyle(size, color, noDark)}>{children}</div>;
+  return <View style={getStyle(size, color, noDark)}>{children}</View>;
 };
 
 export default Badge;

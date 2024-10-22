@@ -1,5 +1,6 @@
 import PropertySelector from "@/components/common/PropertySelector.component";
 import PropertyTopTabButtons from "@/components/common/PropertyTopTabButtons.component";
+import TabNavigator from "@/components/common/TabNavigator.component";
 import DevicesList from "@/components/property/components/DevicesList.component";
 import PropertyGraph from "@/components/property/components/PropertyGraph";
 import { useProperty } from "@/hooks/property/usePropertyHook";
@@ -9,20 +10,14 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 
 const tabs = [
-  { id: "propertyGraph", label: "Gráfica consumos" },
-  { id: "devices", label: "Dispositivos" },
+  { id: "propertyGraph", title: "Gráfica consumos" },
+  { id: "devices", title: "Dispositivos" },
 ];
 
-const PropertyPageSelector = ({ onTabChange }: any) => {
+const PropertyPage = ({ onTabChange }: any) => {
   const { user } = useAuthStore();
   const { isPropertyOwner, propertyDetailsData } = useProperty();
   const [activeTab, setActiveTab] = useState("propertyGraph");
-
-  const handleTabChange = (tabId: any) => {
-    setActiveTab(tabId);
-  };
-
-  useEffect(() => {}, [propertyDetailsData]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -38,9 +33,11 @@ const PropertyPageSelector = ({ onTabChange }: any) => {
   if (isPropertyOwner || (user && user.user.type === ROLES.OWNER)) {
     return (
       <View style={styles.container}>
-        <PropertyTopTabButtons onTabChange={handleTabChange} tabs={tabs} />
-        <PropertySelector />
-        <View style={styles.content}>{renderContent()}</View>
+        <TabNavigator tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+        <View style={{ padding: 16, height: "100%", width: "100%" }}>
+          <PropertySelector />
+          <View style={styles.content}>{renderContent()}</View>
+        </View>
       </View>
     );
   }
@@ -51,12 +48,11 @@ const PropertyPageSelector = ({ onTabChange }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#083344",
+    backgroundColor: "#0F242A",
   },
   content: {
     flex: 1,
-    padding: 16,
   },
 });
 
-export default PropertyPageSelector;
+export default PropertyPage;

@@ -15,7 +15,7 @@ const DevicesList = ({ propertyDetails }: { propertyDetails: any }) => {
     console.log({ data });
     if (propertyDetails) {
       console.log(propertyDetails);
-      setDevices(propertyDetails.devices.sort((a, b) => a.priority - b.priority));
+      setDevices(propertyDetails.devices.sort((a: any, b: any) => a.priority - b.priority));
     }
   }, [propertyDetails, data]);
 
@@ -24,7 +24,7 @@ const DevicesList = ({ propertyDetails }: { propertyDetails: any }) => {
       {!!devices &&
         devices.length > 0 &&
         devices.slice().find((item) => item.authorizedDevice.category === "inverter" || item.authorizedDevice.category === "gateway" || item.authorizedDevice.category === "meter") && (
-          <Text>Dispositivos de lectura</Text>
+          <Text style={{ color: "#DBFFE8", fontSize: 18, fontWeight: "bold" }}>Dispositivos de lectura</Text>
         )}
 
       {!!devices &&

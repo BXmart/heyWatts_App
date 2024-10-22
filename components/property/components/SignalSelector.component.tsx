@@ -32,7 +32,6 @@ const SignalSelector = ({ availableSignals, setSelectedSignals, lineColors, sele
 
   return (
     <View>
-      <Text style={styles.modalTitle}>Señales</Text>
       <View>
         {availableSignals &&
           availableSignals.map((item: any, index: number) => (
@@ -72,13 +71,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     paddingBottom: 40,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 20,
-    textAlign: "center",
   },
   flatList: {
     maxHeight: 300,

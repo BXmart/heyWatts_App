@@ -52,11 +52,14 @@ const OwnerDashboard = ({
     );
   }
 
+  const hasBattery = dashboardData?.deviceDashboard?.batteries !== 0;
+  const hasInverter = dashboardData?.deviceDashboard?.inverterHuawei !== 0 || dashboardData?.deviceDashboard?.inverterFronius !== 0;
+
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
-      <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-        <PropertyInfograph data={dashboardData} hasBattery={true} hasInverter={true} isLoading={isLoading} />
-        <CircularTimeRangesSwiper energySlots={energySlots} compSlots={compSlots} />
+      <View style={{ flex: 1, flexDirection: "row", alignItems: "start", height: 220, gap: 5 }}>
+        <PropertyInfograph data={dashboardData} hasBattery={hasBattery} hasInverter={hasInverter} isLoading={isLoading} />
+        <CircularTimeRangesSwiper energySlots={energySlots} compSlots={compSlots} showCompSlots={hasInverter} />
       </View>
       {<TopSwiperCards data={dashboardData} hasMeterDevices={true} />}
       <DashboardGraph dashboardData={dashboardData} initialData={consumptionData} currentProperty={currentProperty} marketPrices={marketPrices} />

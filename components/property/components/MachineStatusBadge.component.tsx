@@ -4,7 +4,7 @@ import { Badge } from "react-native-paper";
 export const setMachineStatusBadge = (type: string) => {
   const statusBadges: any = {
     standby: <Badge color="gray">Standby</Badge>,
-    charging: (
+    /* charging: (
       <div className="animate-pulse">
         <Badge color="green">Cargando</Badge>
       </div>
@@ -13,7 +13,7 @@ export const setMachineStatusBadge = (type: string) => {
       <div className="animate-pulse">
         <Badge color="green">Descargando</Badge>
       </div>
-    ),
+    ), */
     charged: <Badge color="green">Cargado</Badge>,
     locked: <Badge color="gray">Bloqueado</Badge>,
     off: <Badge color="red">Apagado</Badge>,

@@ -23,7 +23,6 @@ export function parseData(data: any, dataTypes: string[]): ParsedResult {
   dataTypes.forEach(dataType => {
     if (['negativeConsumption', 'positiveConsumption', 'productionCleanVat', 'totalConsumption'].includes(dataType)) {
 
-
       result[dataType] = data[dataType].map((item: any) => {
         const date = new Date(item[0]);
         const hours = date.getHours().toString().padStart(2, '0');
@@ -31,7 +30,7 @@ export function parseData(data: any, dataTypes: string[]): ParsedResult {
         const time24Hour = `${hours}:${minutes}`;
 
         return {
-          type: dataType,
+          type: dataType == "negativeConsumption" ? "Vuelco a red eléctrica" : dataType == "positiveConsumption" ? "Consumo de red eléctrica" : dataType == "productionCleanVat" ? "Producción fotovoltaica" : "Consumo total",
           value: item[1] / 1000 || 0,
           label: time24Hour,
           datetime: new Date(item[0]),

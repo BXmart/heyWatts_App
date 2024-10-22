@@ -62,10 +62,24 @@ const InverterCard = ({ data: device, generalData }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#0A2533",
+    backgroundColor: "#173440",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
+  },
+  loadingContainer: {
+    backgroundColor: "#035170",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 150,
+  },
+  loadingText: {
+    color: "#FFFFFF",
+    marginTop: 10,
+    fontSize: 14,
   },
   deviceName: {
     color: "#FFFFFF",
@@ -106,6 +120,22 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     marginTop: 15,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    borderRadius: 8,
+    padding: 12,
+  },
+  offlineDetails: {
+    opacity: 0.5,
+  },
+  detailsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginHorizontal: -8, // Compensate for detailItem padding
+  },
+  detailItem: {
+    width: "50%",
+    paddingHorizontal: 8,
+    marginBottom: 12,
   },
   detailRow: {
     flexDirection: "row",
@@ -113,12 +143,36 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   detailLabel: {
-    color: "#4A6F85",
+    color: "#7eabbf",
     fontSize: 14,
+    marginBottom: 4,
   },
   detailValue: {
+    color: "#E3E3E3",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  unitText: {
+    color: "#4A6F85",
+    fontSize: 12,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "rgba(74, 111, 133, 0.2)",
+    marginVertical: 15,
+  },
+  offlineContainer: {
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    marginTop: 10,
+  },
+  offlineText: {
     color: "#FFFFFF",
     fontSize: 14,
+    textAlign: "center",
+    opacity: 0.8,
   },
 });
 

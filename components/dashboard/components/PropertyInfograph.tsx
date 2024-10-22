@@ -39,13 +39,13 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter, isLoading }: { data:
     }
   };
 
-  if (hasBattery && hasInverter) {
-    return (
-      <View style={styles.card}>
-        <Text style={{ color: "white" }}>Resumen propiedad</Text>
-        <View style={styles.container}>
-          <IconHouse />
-          {/* TOP */}
+  return (
+    <View style={styles.card}>
+      <Text style={{ fontSize: 14, color: "lightgray", fontWeight: "bold" }}>Resumen propiedad</Text>
+      <View style={styles.container}>
+        <IconHouse />
+        {/* TOP */}
+        {hasInverter && (
           <View style={styles.topSection}>
             <View style={{ flex: 1, flexDirection: "row" }}>
               <IconSolar />
@@ -54,42 +54,52 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter, isLoading }: { data:
               </Text>
             </View>
             {/* <Feather name={getArrowDirection(-data.propertyResume.production, "up")} size={24} color="#10B981" /> */}
-            <DottedLine length={30} dotSize={10} dotColor="#10B981" reverse={false} direction="vertical" duration={3000} />
+            <DottedLine length={30} dotSize={10} dotColor="#FFFFFF" reverse={false} direction="vertical" duration={3000} />
           </View>
+        )}
 
-          {/* RIGHT */}
-          <View style={styles.rightSection}>
-            {/* <Feather name={getArrowDirection(-(!isLoading? data.propertyResume.production ?? 0 : 0), "right")} size={24} color="#10B981" /> */}
-            <DottedLine
-              style={{ top: 15, left: -40, position: "absolute" }}
-              length={50}
-              dotSize={10}
-              dotColor="#10B981"
-              reverse={-(!isLoading ? data.propertyResume.production ?? 0 : 0) < 0}
-              direction="horizontal"
-              duration={3000}
-            />
-            <View style={{ flex: 1, flexDirection: "row" }}>
-              <IconPylon />
-              <Text style={[styles.text, styles.rightText, (!isLoading ? data.propertyResume.production ?? 0 : 0) !== 0 && styles.animatedText]}>
-                {(!isLoading ? data.propertyResume.production ?? 0 : 0) === 0 ? "0" : Math.abs((!isLoading ? data.propertyResume.production ?? 0 : 0) / 1000).toFixed(2)} kW
-              </Text>
-            </View>
+        {/* RIGHT */}
+        <View style={styles.rightSection}>
+          {/* <Feather name={getArrowDirection(-(!isLoading? data.propertyResume.production ?? 0 : 0), "right")} size={24} color="#10B981" /> */}
+          <DottedLine
+            style={{ top: 15, left: -40, position: "absolute" }}
+            length={50}
+            dotSize={10}
+            dotColor="#10B981"
+            reverse={-(!isLoading ? data.propertyResume.consumption ?? 0 : 0) < 0}
+            direction="horizontal"
+            duration={3000}
+          />
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <IconPylon />
+            <Text style={[styles.text, styles.rightText, (!isLoading ? data.propertyResume.consumption ?? 0 : 0) !== 0 && styles.animatedText]}>
+              {(!isLoading ? data.propertyResume.consumption ?? 0 : 0) === 0 ? "0" : Math.abs((!isLoading ? data.propertyResume.consumption ?? 0 : 0) / 1000).toFixed(2)} kW
+            </Text>
           </View>
+        </View>
 
-          {/* BOTTOM */}
-          <View style={styles.bottomSection}>
-            {/* <Feather name={getArrowDirection(data.propertyResume.total_consumption, "down")} size={24} color="#10B981" /> */}
-            <DottedLine style={{ top: -30, left: 7, position: "absolute" }} length={30} dotSize={10} dotColor="#10B981" reverse={false} direction="vertical" duration={3000} />
-            <View style={{ flex: 1, flexDirection: "row" }}>
-              <IconPlug />
-              <Text style={[styles.text, styles.bottomText]}>
-                {!isLoading ? (data.propertyResume.total_consumption === 0 ? "0" : Math.abs(data.propertyResume.total_consumption / 1000).toFixed(2)) : "0"} kW
-              </Text>
-            </View>
+        {/* BOTTOM */}
+        <View style={styles.bottomSection}>
+          {/* <Feather name={getArrowDirection(data.propertyResume.total_consumption, "down")} size={24} color="#10B981" /> */}
+          <DottedLine
+            style={{ top: -30, left: 7, position: "absolute" }}
+            length={30}
+            dotSize={10}
+            dotColor="#10B981"
+            reverse={-(!isLoading ? data.propertyResume.total_consumption ?? 0 : 0) < 0}
+            direction="vertical"
+            duration={3000}
+          />
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <IconPlug />
+            <Text style={[styles.text, styles.bottomText]}>
+              {!isLoading ? (data.propertyResume.total_consumption === 0 ? "0" : Math.abs(data.propertyResume.total_consumption / 1000).toFixed(2)) : "0"} kW
+            </Text>
           </View>
+        </View>
 
-          {/* LEFT */}
+        {/* LEFT */}
+        {hasBattery && (
           <View style={styles.leftSection}>
             <View style={{ flex: 1, flexDirection: "row" }}>
               <IconBattery />
@@ -106,25 +116,23 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter, isLoading }: { data:
               reverse={!isLoading && data.propertyResume.battery > 0}
               direction="horizontal"
               duration={3000}
-              pause={isLoading}
             />
           </View>
-        </View>
+        )}
       </View>
-    );
-  }
-  // Add similar code for other conditions (hasInverter && !hasBattery, !hasInverter, etc.)
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     width: width / 2.7,
+    height: "100%",
     padding: 5,
-    maxHeight: 140,
-    height: 200,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 8,
   },
   container: {

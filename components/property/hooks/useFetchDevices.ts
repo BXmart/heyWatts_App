@@ -15,7 +15,6 @@ export const useFetchExternalCommunications = () => {
       setIsLoading(true);
       try {
         const response = await getExternalCommunicationsByUserId(user!.user._id);
-        console.log({ response })
         setData(response);
       } catch (error) {
         setIsLoading(false);
