@@ -61,7 +61,7 @@ export async function getHistoricDeviceById({ deviceId, code, startDate, endDate
   const bearerToken = 'Bearer ' + token;
   const url = new URL(API_URL.concat(`/api/v1/web/devices/${deviceId}/historic`));
   !!code && url.searchParams.append('code', code);
-  const { data } = await axios.get(url.href, { Authorization: bearerToken, startDate, endDate });
+  const { data } = await axios.get(url.href, { headers: { Authorization: bearerToken, startDate, endDate } });
   return data;
 }
 

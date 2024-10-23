@@ -27,7 +27,7 @@ const PropertyGraph = React.memo(() => {
   const [parsedData, setParsedData] = useState<any[]>([]);
   const scrollRef = useRef(null);
   const [time, setTime] = useState(new Date());
-  const [isCompressed, setIsCompressed] = useState(false);
+  const [isCompressed, setIsCompressed] = useState(Platform.OS === "android");
 
   // Use window dimensions hook for dynamic width/height
   const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = useWindowDimensions();
@@ -287,9 +287,9 @@ const PropertyGraph = React.memo(() => {
           yAxisThickness={2}
           xAxisThickness={2}
           /* dataPointsColor="#DBFFE8" */
+          interpolateMissingValues={false}
           hideRules
           hideDataPoints
-          curved
           pointerConfig={{
             activatePointersOnLongPress: true,
             pointerStripUptoDataPoint: true,

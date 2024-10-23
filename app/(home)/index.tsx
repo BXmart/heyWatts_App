@@ -21,7 +21,7 @@ export default function Dashboard() {
   const router = useRouter();
 
   const handleCTApress = () => {
-    router.push("/(home)/understand-your-bill");
+    router.push("/understand-your-bill");
   };
 
   if (!user) {

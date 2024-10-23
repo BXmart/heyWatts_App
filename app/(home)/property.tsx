@@ -40,9 +40,13 @@ const PropertyPage = ({ onTabChange }: any) => {
         </View>
       </View>
     );
+  } else {
+    return (
+      <View style={styles.container}>
+        <Text>Coming soon!</Text>
+      </View>
+    );
   }
-
-  return null;
 };
 
 const styles = StyleSheet.create({

@@ -19,7 +19,7 @@ import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
 import { DetailPropertyI } from "@/types/DetailProperty";
 import { View } from "@/components/Themed";
 import { PagedPropertiesResponseI, TabsContextType, TabsProvider } from "../../context/TabsContext";
-import Skeleton from "react-loading-skeleton";
+import Fontisto from "@expo/vector-icons/Fontisto";
 import LoadingScreen from "@/components/common/SkeletonLoader/SkeletonLoader.component";
 
 export default function HomeLayout() {
@@ -135,7 +135,7 @@ export default function HomeLayout() {
               fontSize: 23,
             },
             tabBarActiveBackgroundColor: "#035170",
-            tabBarIcon: ({ color }) => <FontAwesome6 name="house-chimney" size={24} color="#DBFFE8" />,
+            tabBarIcon: ({ color }) => <FontAwesome6 name="house-user" size={24} color="#DBFFE8" />,
             tabBarLabelStyle: {
               color: "#DBFFE8",
             },
@@ -147,9 +147,9 @@ export default function HomeLayout() {
           }}
         />
         <Tabs.Screen
-          name="suggestions"
+          name="proposals"
           options={{
-            title: "Sugerencias",
+            title: "Simulaciones",
             headerStyle: {
               shadowColor: "black",
               shadowRadius: 4,
@@ -161,7 +161,7 @@ export default function HomeLayout() {
               fontSize: 23,
             },
             tabBarActiveBackgroundColor: "#035170",
-            tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color="#DBFFE8" />,
+            tabBarIcon: ({ color }) => <Fontisto name="lightbulb" size={24} color="#DBFFE8" />,
             tabBarLabelStyle: {
               color: "#DBFFE8",
             },
