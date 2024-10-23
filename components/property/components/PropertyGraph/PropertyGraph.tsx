@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef, useReducer } from "react";
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, useWindowDimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, useWindowDimensions, Platform } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { LineChart } from "react-native-gifted-charts";
 import { useDayHistoricGraph } from "@/hooks/property/useDayHistoricGraph";
-import { parseData } from "../../dashboard/utils/parsePropertyGraphData";
-import SignalSelector from "./SignalSelector.component";
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import Feather from "@expo/vector-icons/Feather";
 import * as ScreenOrientation from "expo-screen-orientation";
+import { parseData } from "@/components/dashboard/utils/parsePropertyGraphData";
+import SignalSelector from "../SignalSelector.component";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CHART_PADDING = 32;
@@ -26,7 +26,7 @@ const PropertyGraph = React.memo(() => {
   const [selectedSignals, setSelectedSignals] = useState(["totalConsumption"]);
   const [parsedData, setParsedData] = useState<any[]>([]);
   const scrollRef = useRef(null);
-  const [time, setTime] = useState();
+  const [time, setTime] = useState(new Date());
   const [isCompressed, setIsCompressed] = useState(false);
 
   // Use window dimensions hook for dynamic width/height
@@ -104,16 +104,6 @@ const PropertyGraph = React.memo(() => {
       setParsedData([...dataArray]);
     }
   }, [data, selectedSignals]);
-
-  const onChange = (event: any, selectedDate: Date) => {
-    const currentDate = selectedDate;
-    setSelectedDay(currentDate);
-  };
-
-  const onChangeTime = (event: any, selectedTime: any) => {
-    showOrHidePointer(selectedTime);
-    setTime(selectedTime);
-  };
 
   const showOrHidePointer = (time: Date) => {
     if (scrollRef.current) {
@@ -338,6 +328,40 @@ const PropertyGraph = React.memo(() => {
       </View>
     );
   }
+  const [mode, setMode] = useState("date");
+  const [showDate, setShowDate] = useState(false);
+  const [showTime, setShowTime] = useState(false);
+
+  const onChange = (event: any, selectedValue: any) => {
+    const currentDate = selectedValue || new Date();
+    setSelectedDay(currentDate);
+  };
+
+  const onChangeTime = (event: any, selectedValue: any) => {
+    const selectedTime = selectedValue || new Date();
+    showOrHidePointer(selectedTime);
+    setTime(selectedTime);
+  };
+
+  const openDatePickHandler: VoidFunction = () => {
+    if (Platform.OS === "android") {
+      DateTimePickerAndroid.open({
+        mode: "date",
+        value: selectedDay,
+        onChange: (event, newDate) => {
+          setSelectedDay(newDate);
+        },
+      });
+    } else {
+      DateTimePicker.show({
+        mode: "date",
+        date: selectedDay,
+        onChange: (event, newDate) => {
+          if (newDate) setSelectedDay(newDate);
+        },
+      });
+    }
+  };
 
   if (isLoading) return <ActivityIndicator size="large" color="#164E63" />;
 
@@ -348,8 +372,22 @@ const PropertyGraph = React.memo(() => {
           <View style={styles.fixedSection}>
             <View style={styles.headerRow}>
               <View style={styles.datePickersContainer}>
-                <DateTimePicker testID="datePicker" value={selectedDay ?? new Date()} mode="date" display="default" themeVariant="dark" onChange={onChange} />
-                <DateTimePicker testID="timePicker" value={time ?? new Date()} mode="time" display="default" themeVariant="dark" onChange={onChangeTime} />
+                {Platform.OS === "android" && (
+                  <>
+                    <TouchableOpacity onPress={openDatePickHandler}>
+                      <Text style={styles.title}>{selectedDay.toLocaleString()}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setShowTime(true)}>
+                      <Text style={styles.title}>{time.toLocaleTimeString()}</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+                {Platform.OS !== "android" && (
+                  <>
+                    {showDate && <DateTimePicker testID="datePicker" value={selectedDay ?? new Date()} mode="date" display="default" themeVariant="dark" onChange={onChange} />}
+                    {showTime && <DateTimePicker testID="timePicker" value={time ?? new Date()} mode="time" display="default" themeVariant="dark" onChange={onChangeTime} />}
+                  </>
+                )}
               </View>
               <TouchableOpacity style={styles.viewToggle} onPress={() => setIsCompressed(!isCompressed)}>
                 {isCompressed ? <Feather name="maximize-2" size={24} color="black" /> : <Feather name="minimize-2" size={24} color="black" />}
@@ -376,6 +414,13 @@ const PropertyGraph = React.memo(() => {
 export default PropertyGraph;
 
 const styles = StyleSheet.create({
+  title: {
+    color: "white",
+    fontWeight: "bold",
+    backgroundColor: "#164E63",
+    padding: 10,
+    fontSize: 16,
+  },
   mainContainer: {
     flex: 1,
     backgroundColor: "#0F242A",
