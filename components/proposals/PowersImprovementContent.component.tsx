@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from "react-native";
-import { Link } from "expo-router";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { Link } from 'expo-router';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { ExpandableContent } from "./ExpandableContent.component";
-import { Accordion } from "../common/Accordion.component";
-import { getPowersToChangeInTwoArrays } from "@/utils/powers/getPowersToChangeInTwoArrays";
-import { setData } from "@/utils/powers/setData";
+import { ExpandableContent } from './ExpandableContent.component';
+import { Accordion } from '../common/Accordion.component';
+import { getPowersToChangeInTwoArrays } from '@/utils/powers/getPowersToChangeInTwoArrays';
+import { setData } from '@/utils/powers/setData';
 
-import Badge from "../common/Badge";
-import PowersTable from "./PowersTable.component";
-import { parsePowersDetails } from "./utils/parsePowersDetails";
-import { getPowersToChange } from "@/utils/powers/getPowersToChange";
-import { HelpModal } from "../common/HelpModal.component";
+import Badge from '../common/Badge';
+import PowersTable from './PowersTable.component';
+import { parsePowersDetails } from './utils/parsePowersDetails';
+import { getPowersToChange } from '@/utils/powers/getPowersToChange';
+import { HelpModal } from '../common/HelpModal.component';
 
 interface PowersProps {
   proposal: any;
@@ -53,7 +53,7 @@ const PowersImprovementContent: React.FC<{ props: PowersProps }> = ({ props }) =
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{data.title}</Text>
             <TouchableOpacity onPress={() => setVisibleHelp(true)} style={styles.helpButton}>
-              <Feather name="help-circle" size={20} color={visibleHelp ? "#DBFFE8" : "#035170"} />
+              <Feather name="help-circle" size={20} color={visibleHelp ? '#DBFFE8' : '#035170'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -100,11 +100,11 @@ const PowersImprovementContent: React.FC<{ props: PowersProps }> = ({ props }) =
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#083344", // deepBlue
+    backgroundColor: '#083344', // deepBlue
     borderRadius: 12,
     margin: 8,
     padding: 16,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -114,40 +114,40 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   contentContainer: {
-    position: "relative",
+    position: 'relative',
   },
   badgeContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
     zIndex: 1,
   },
   badgeText: {
-    color: "#DBFFE8", // mintGreen
+    color: '#DBFFE8', // mintGreen
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 16,
     paddingRight: 100,
   },
   iconContainer: {
     width: 40,
-    alignItems: "center",
+    alignItems: 'center',
   },
   titleContainer: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     marginLeft: 12,
   },
   title: {
     fontSize: 20,
-    fontWeight: "600",
-    color: "#DBFFE8", // mintGreen
+    fontWeight: '600',
+    color: '#DBFFE8', // mintGreen
     flex: 1,
   },
   helpButton: {
@@ -160,14 +160,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dataSection: {
-    backgroundColor: "#035170", // lightBlue
+    backgroundColor: '#035170', // lightBlue
     borderRadius: 8,
     padding: 16,
     gap: 12,
   },
   descriptionText: {
     fontSize: 14,
-    color: "#DBFFE8", // mintGreen
+    color: '#DBFFE8', // mintGreen
     opacity: 0.9,
   },
   savingsContainer: {
@@ -175,13 +175,13 @@ const styles = StyleSheet.create({
   },
   savingsLabel: {
     fontSize: 12,
-    color: "#DBFFE8", // mintGreen
+    color: '#DBFFE8', // mintGreen
     opacity: 0.8,
   },
   savingsAmount: {
-    fontSize: 28,
-    fontWeight: "600",
-    color: "#22C55E", // green
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#22C55E', // green
   },
   savingsUnit: {
     fontSize: 14,
@@ -189,37 +189,37 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 24,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   addDeviceButton: {
-    backgroundColor: "#22C55E", // green
+    backgroundColor: '#22C55E', // green
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
   },
   buttonText: {
-    color: "#DBFFE8", // mintGreen
-    fontWeight: "500",
+    color: '#DBFFE8', // mintGreen
+    fontWeight: '500',
     fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 16,
   },
   modalContent: {
-    backgroundColor: "#083344", // deepBlue
+    backgroundColor: '#083344', // deepBlue
     borderRadius: 12,
     padding: 16,
-    width: "90%",
+    width: '90%',
     borderWidth: 1,
-    borderColor: "#035170", // lightBlue
+    borderColor: '#035170', // lightBlue
   },
   modalText: {
-    color: "#DBFFE8", // mintGreen
+    color: '#DBFFE8', // mintGreen
     fontSize: 14,
     lineHeight: 20,
   },

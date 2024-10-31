@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
-import { Card } from "react-native-paper";
-import Modal from "react-native-modal";
-import { Ionicons } from "@expo/vector-icons";
-import { OwnerDashboardI } from "@/types/OwnerDashboard";
-import { getOwnerInvoice, InvoiceData } from "@/services/dashboard.service";
-import PropertyInfograph from "../PropertyInfograph";
-import OwnerDashboardTodayMoneyCard from "./OwnerDashboardTodayMoneyCard";
-import OwnerDashboardPredictMoneyCard from "./OwnerDashboardPredictMoneyCard";
-import OwnerDashboardTopEnergyConsumedCard from "./OwnerDashboardTopEnergyConsumed";
-import OwnerDashboardTopMoneyConsumedCard from "./OwnerDashboardTopMoneyCard";
-import { string } from "zod";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { Card } from 'react-native-paper';
+import Modal from 'react-native-modal';
+import { Ionicons } from '@expo/vector-icons';
+import { OwnerDashboardI } from '@/types/OwnerDashboard';
+import { getOwnerInvoice, InvoiceData } from '@/services/dashboard.service';
+import PropertyInfograph from '../PropertyInfograph';
+import OwnerDashboardTodayMoneyCard from './OwnerDashboardTodayMoneyCard';
+import OwnerDashboardPredictMoneyCard from './OwnerDashboardPredictMoneyCard';
+import OwnerDashboardTopEnergyConsumedCard from './OwnerDashboardTopEnergyConsumed';
+import OwnerDashboardTopMoneyConsumedCard from './OwnerDashboardTopMoneyCard';
+import { string } from 'zod';
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 interface TopSwiperCardsProps {
   data: OwnerDashboardI;
@@ -21,7 +21,7 @@ interface TopSwiperCardsProps {
 
 const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }) => {
   const [invoiceData, setInvoiceData] = useState<InvoiceData>();
-  const [visibleHelp, setVisibleHelp] = useState({ isOpen: false, data: null as "prediction" | "actual" | null });
+  const [visibleHelp, setVisibleHelp] = useState({ isOpen: false, data: null as 'prediction' | 'actual' | null });
   const [error, setError] = useState(false);
 
   const hasBattery = data?.deviceDashboard?.batteries !== 0;
@@ -36,16 +36,16 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
     }
   };
 
-  const handleChangeModal = (boolean: boolean, data: "prediction" | "actual") => {
+  const handleChangeModal = (boolean: boolean, data: 'prediction' | 'actual') => {
     setVisibleHelp({ isOpen: boolean, data });
   };
 
   const otherCosts = (data?: InvoiceData) => {
     if (!data) return 0;
-    const totalCost = data?.[visibleHelp.data ?? "actual"]?.totalCost;
-    const energyTermCost = data?.[visibleHelp.data ?? "actual"]?.energyTermCost;
-    const powerTermCost = data?.[visibleHelp.data ?? "actual"]?.powerTermCost;
-    const costPenalty = data?.[visibleHelp.data ?? "actual"]?.costPenalty;
+    const totalCost = data?.[visibleHelp.data ?? 'actual']?.totalCost;
+    const energyTermCost = data?.[visibleHelp.data ?? 'actual']?.energyTermCost;
+    const powerTermCost = data?.[visibleHelp.data ?? 'actual']?.powerTermCost;
+    const costPenalty = data?.[visibleHelp.data ?? 'actual']?.costPenalty;
 
     return totalCost - energyTermCost - powerTermCost - costPenalty;
   };
@@ -63,38 +63,38 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
         {/* Left column */}
         <View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.powerTermCost?.toFixed(2) || "0.00"}€</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? 'actual']?.powerTermCost?.toFixed(2) || '0.00'}€</Text>
             <Text style={styles.modalLabel}>Término Potencia</Text>
           </View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.energyTermCost?.toFixed(2) || "0.00"}€</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? 'actual']?.energyTermCost?.toFixed(2) || '0.00'}€</Text>
             <Text style={styles.modalLabel}>Término Energía</Text>
           </View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.costPenalty?.toFixed(2) || "0.00"}€</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? 'actual']?.costPenalty?.toFixed(2) || '0.00'}€</Text>
             <Text style={styles.modalLabel}>Penalización</Text>
           </View>
         </View>
         {/* Right column */}
         <View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.energyConsumed?.toFixed(2) || "0.00"} kWh</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? 'actual']?.energyConsumed?.toFixed(2) || '0.00'} kWh</Text>
             <Text style={styles.modalLabel}>Energía Consumida</Text>
           </View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? "actual"]?.energySurplus?.toFixed(2) || "0.00"} kWh</Text>
+            <Text style={styles.modalValue}>{invoiceData?.[visibleHelp.data ?? 'actual']?.energySurplus?.toFixed(2) || '0.00'} kWh</Text>
             <Text style={styles.modalLabel}>Energía Volcada</Text>
           </View>
           <View style={styles.modalRow}>
-            <Text style={styles.modalValue}>{otherCosts(invoiceData)?.toFixed(2) || "0.00"}€</Text>
+            <Text style={styles.modalValue}>{otherCosts(invoiceData)?.toFixed(2) || '0.00'}€</Text>
             <Text style={styles.modalLabel}>Otros costes*</Text>
           </View>
         </View>
       </View>
       <Text style={styles.modalFootnote}>
-        {visibleHelp?.data === "actual"
-          ? "*Incluimos todos los impuestos y costes adicionales basados en la tarifa que tienes. Si no tenemos tu tarifa, usamos un promedio. Para que nuestros cálculos sean más precisos, sería ideal que nos envíes tu CUPS y tus facturas."
-          : "*Incluimos todos los impuestos y costes adicionales basados en los datos de tu tarifa. Si no tenemos detalles de tu tarifa, utilizamos un promedio. En caso de tarifas indexadas, hacemos estimaciones según los precios de mercado, pero ten en cuenta que pueden variar respecto a los resultados finales."}
+        {visibleHelp?.data === 'actual'
+          ? '*Incluimos todos los impuestos y costes adicionales basados en la tarifa que tienes. Si no tenemos tu tarifa, usamos un promedio. Para que nuestros cálculos sean más precisos, sería ideal que nos envíes tu CUPS y tus facturas.'
+          : '*Incluimos todos los impuestos y costes adicionales basados en los datos de tu tarifa. Si no tenemos detalles de tu tarifa, utilizamos un promedio. En caso de tarifas indexadas, hacemos estimaciones según los precios de mercado, pero ten en cuenta que pueden variar respecto a los resultados finales.'}
       </Text>
     </View>
   );
@@ -146,10 +146,10 @@ const styles = StyleSheet.create({
     height: 180,
   },
   slide: {
-    width: "auto",
+    padding: 5,
+    width: 'auto',
     maxWidth: width / 2,
     paddingHorizontal: 5,
-    backgroundColor: "transparent",
   },
   errorCard: {
     height: 140,
@@ -158,38 +158,38 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#64748B",
+    fontWeight: '500',
+    color: '#64748B',
   },
   errorMessage: {
     fontSize: 16,
-    fontWeight: "500",
-    color: "#EF4444",
+    fontWeight: '500',
+    color: '#EF4444',
     marginTop: 8,
   },
   modal: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: 22,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 4,
-    borderColor: "rgba(0, 0, 0, 0.1)",
+    borderColor: 'rgba(0, 0, 0, 0.1)',
     maxWidth: 450,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#64748B",
+    fontWeight: 'bold',
+    color: '#64748B',
     marginBottom: 16,
   },
   modalGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
     marginBottom: 16,
   },
   modalRow: {
@@ -197,18 +197,18 @@ const styles = StyleSheet.create({
   },
   modalValue: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#10B981",
+    fontWeight: '500',
+    color: '#10B981',
   },
   modalLabel: {
     fontSize: 12,
-    color: "#64748B",
+    color: '#64748B',
   },
   modalFootnote: {
     fontSize: 12,
-    color: "#64748B",
-    fontStyle: "italic",
-    textAlign: "center",
+    color: '#64748B',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
 });
 

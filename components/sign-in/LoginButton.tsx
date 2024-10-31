@@ -1,5 +1,5 @@
-import { Component, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Component, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 interface LoginButtonStyle {
   loginButtonContainer: object;
   loginButton: object;
@@ -11,10 +11,7 @@ interface LoginButtonProps {
   style: LoginButtonStyle;
 }
 
-export default function LoginButton({
-  loginFunction,
-  style,
-}: LoginButtonProps) {
+export default function LoginButton({ loginFunction, style }: LoginButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
@@ -25,23 +22,15 @@ export default function LoginButton({
 
   return (
     <View style={style.loginButtonContainer}>
-      <TouchableOpacity
-        style={style.loginButton}
-        onPress={handleClick}
-        disabled={loading}
-      >
+      <TouchableOpacity style={style.loginButton} onPress={handleClick} disabled={loading}>
         <Text
           style={{
-            ...style.loginButtonText,
             opacity: loading ? 0 : 100,
           }}
         >
           Login
         </Text>
-        <ActivityIndicator
-          style={{ position: "absolute" }}
-          animating={loading}
-        />
+        <ActivityIndicator style={{ position: 'absolute' }} animating={loading} />
       </TouchableOpacity>
     </View>
   );

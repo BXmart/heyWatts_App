@@ -1,11 +1,11 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Card } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Card } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
 // You'll need to implement these functions or import them from your lib
-import { calculatePercentageChange, convertWattsToHours } from "@/utils";
-import { InvoiceData } from "@/services/dashboard.service";
+import { calculatePercentageChange, convertWattsToHours } from '@/utils';
+import { InvoiceData } from '@/services/dashboard.service';
 
 const ComparisonRow: React.FC<{
   compareValue: number;
@@ -18,12 +18,12 @@ const ComparisonRow: React.FC<{
     return <Text style={styles.noDataText}>{noDataText}</Text>;
   }
 
-  const [value, unit] = convertedValue.split(" ");
+  const [value, unit] = convertedValue.split(' ');
   const isPositive = compareValue > 0;
 
   return (
     <View style={styles.comparisonRow}>
-      <Text style={[styles.changeIcon, isPositive ? styles.increaseText : styles.decreaseText]}>{isPositive ? "▲" : "▼"}</Text>
+      <Text style={[styles.changeIcon, isPositive ? styles.increaseText : styles.decreaseText]}>{isPositive ? '▲' : '▼'}</Text>
       <Text style={[styles.changeValue, isPositive ? styles.increaseText : styles.decreaseText]}>
         {value}
         <Text style={styles.unitText}> {unit} </Text>
@@ -50,8 +50,8 @@ const OwnerDashboardTopEnergyConsumedCard = ({ invoiceData }: { invoiceData: Inv
         <Text style={styles.headerText}>Consumo mes en energía</Text>
         <View style={styles.contentContainer}>
           <Text style={styles.mainNumber}>
-            {(energyKwActualCicle < 0 ? "-" : "") + convertWattsToHours(energyKwActualCicle * 1000).split(" ")[0]}
-            <Text style={styles.unitText}>{" " + convertWattsToHours(energyKwActualCicle * 1000).split(" ")[1]}</Text>
+            {(energyKwActualCicle < 0 ? '-' : '') + convertWattsToHours(energyKwActualCicle * 1000).split(' ')[0]}
+            <Text style={styles.unitText}>{' ' + convertWattsToHours(energyKwActualCicle * 1000).split(' ')[1]}</Text>
           </Text>
 
           <View style={styles.comparisonsContainer}>
@@ -82,26 +82,26 @@ const OwnerDashboardTopEnergyConsumedCard = ({ invoiceData }: { invoiceData: Inv
 
 const styles = StyleSheet.create({
   card: {
-    height: 140,
+    height: 150,
     padding: 16,
-    position: "relative",
-    backgroundColor: "transparent",
-    shadowColor: "transparent",
+    position: 'relative',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    shadowColor: 'transparent',
   },
   headerText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#64748B",
+    fontWeight: '500',
+    color: '#64748B',
     marginBottom: 4,
   },
   contentContainer: {
-    flexDirection: "column",
+    flexDirection: 'column',
     gap: 8,
   },
   mainNumber: {
-    fontSize: 28,
-    fontWeight: "500",
-    color: "#10B981",
+    fontSize: 24,
+    fontWeight: '500',
+    color: '#10B981',
     marginBottom: -8,
   },
   unitText: {
@@ -109,12 +109,12 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   comparisonsContainer: {
-    flexDirection: "column",
+    flexDirection: 'column',
     minWidth: 96,
   },
   comparisonRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   changeIcon: {
     fontSize: 12,
@@ -122,26 +122,26 @@ const styles = StyleSheet.create({
   },
   changeValue: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   comparisonText: {
     fontSize: 12,
-    color: "#64748B",
-    fontWeight: "500",
+    color: '#64748B',
+    fontWeight: '500',
   },
   increaseText: {
-    color: "#EF4444",
+    color: '#EF4444',
   },
   decreaseText: {
-    color: "#10B981",
+    color: '#10B981',
   },
   noDataText: {
     fontSize: 12,
-    color: "#9CA3AF",
-    fontWeight: "500",
+    color: '#9CA3AF',
+    fontWeight: '500',
   },
   iconContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 20,
     right: 16,
   },

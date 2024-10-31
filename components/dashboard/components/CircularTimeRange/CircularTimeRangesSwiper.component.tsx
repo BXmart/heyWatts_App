@@ -1,21 +1,21 @@
-import * as React from "react";
-import { Dimensions, Text, View, StyleSheet } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
-import CircularTimeRange from "./CircularTimeRange.component";
-import { TimeSlot } from "../../utils/circularTimeRangeUtils";
-import { Modal } from "react-native-paper";
-import CircularTimeRangeWrapper from "./CircularTimeRangeWrapper.component";
-const width = Dimensions.get("window").width;
+import * as React from 'react';
+import { Dimensions, Text, View, StyleSheet } from 'react-native';
+import Carousel from 'react-native-reanimated-carousel';
+import CircularTimeRange from './CircularTimeRange.component';
+import { TimeSlot } from '../../utils/circularTimeRangeUtils';
+import { Modal } from 'react-native-paper';
+import CircularTimeRangeWrapper from './CircularTimeRangeWrapper.component';
+const width = Dimensions.get('window').width;
 
 const CircularTimeRangesSwiper = ({ energySlots, compSlots, showCompSlots = false }: { energySlots: TimeSlot[]; compSlots: TimeSlot[]; showCompSlots: boolean }) => {
   const [index, setIndex] = React.useState<number>(0);
 
   const data = showCompSlots
     ? [
-        { type: "energy", slots: energySlots },
-        { type: "comp", slots: compSlots },
+        { type: 'energy', slots: energySlots },
+        { type: 'comp', slots: compSlots },
       ]
-    : [{ type: "energy", slots: energySlots }];
+    : [{ type: 'energy', slots: energySlots }];
 
   return (
     <>
@@ -38,21 +38,21 @@ const CircularTimeRangesSwiper = ({ energySlots, compSlots, showCompSlots = fals
             renderItem={({ item, index }) => (
               <View
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
-                <CircularTimeRangeWrapper slots={item.slots} type={index == 0 ? "energy" : "comp"} />
+                <CircularTimeRangeWrapper slots={item.slots} type={index == 0 ? 'energy' : 'comp'} />
               </View>
             )}
           />
-          <View style={{ flexDirection: "row", gap: 5, alignItems: "center", alignContent: "space-between" }}>
+          <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', alignContent: 'space-between' }}>
             {Array.from({ length: data.length }).map((_, i) => (
               <View
                 key={`pagination-${i}`}
                 style={{
-                  backgroundColor: i === index ? "white" : "lightgray",
+                  backgroundColor: i === index ? 'white' : 'lightgray',
                   borderRadius: 5,
                   width: 8,
                   height: 8,
@@ -65,12 +65,12 @@ const CircularTimeRangesSwiper = ({ energySlots, compSlots, showCompSlots = fals
         <View
           style={{
             width: width / 1.7,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <CircularTimeRangeWrapper slots={energySlots} type={"energy"} />
+          <CircularTimeRangeWrapper slots={energySlots} type={'energy'} />
         </View>
       )}
     </>
@@ -81,11 +81,11 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     width: width / 2.7,
-    height: "100%",
+    height: '100%',
     padding: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 8,
   },
 });

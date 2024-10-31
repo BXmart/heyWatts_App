@@ -1,6 +1,6 @@
-import { Text } from "@/components/Themed";
-import { TextProps } from "@/components/Themed";
+import { Text } from '@/components/Themed';
+import { TextProps } from '@/components/Themed';
 
 export function MonoText(props: TextProps) {
-  return <Text {...props} style={[props.style, { fontFamily: "SpaceMono" }]} />;
+  return <Text {...props} style={[{ fontFamily: 'SpaceMono' }]} />;
 }
