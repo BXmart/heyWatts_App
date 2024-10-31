@@ -9,15 +9,26 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/branding/hw-iso-hor-color-01.png",
-      "resizeMode": "cover",
+      "resizeMode": "contain",
       "backgroundColor": "#2A434D"
     },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "splash": {
+        "image": "./assets/branding/hw-iso-hor-color-01.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#2A434D"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/branding/hw-iso-hor-color-01.png",
+        "backgroundColor": "#2A434D"
+      },
+      "splash": {
+        "image": "./assets/branding/hw-iso-hor-color-01.png",
+        "resizeMode": "contain",
         "backgroundColor": "#2A434D"
       },
       "package": "com.dwebb1.heyWattsApp"
@@ -52,5 +63,3 @@
     }
   }
 }
-
-

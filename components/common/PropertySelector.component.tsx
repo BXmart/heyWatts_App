@@ -1,8 +1,8 @@
-import { useTabsContext } from "@/context/TabsContext";
-import useAuthStore from "@/stores/useAuthStore";
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
-import { Dropdown } from "react-native-element-dropdown";
+import { useTabsContext } from '@/context/TabsContext';
+import useAuthStore from '@/stores/useAuthStore';
+import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { Dropdown } from 'react-native-element-dropdown';
 
 const PropertySelector = () => {
   const { currentProperty, setCurrentProperty } = useAuthStore();
@@ -20,7 +20,7 @@ const PropertySelector = () => {
       maxHeight={300}
       labelField="label"
       valueField="value"
-      placeholder={"Sectiona una propiedad"}
+      placeholder={'Sectiona una propiedad'}
       searchPlaceholder="Search..."
       value={currentProperty}
       onChange={(item) => {
@@ -36,25 +36,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#0F242A",
+    backgroundColor: '#0F242A',
   },
   dropdown: {
-    height: 50,
-    width: "auto",
-    borderColor: "#DBFFE8",
+    height: 30,
+    width: 'auto',
+    borderColor: '#DBFFE8',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
     marginBottom: 16,
-    color: "#DBFFE8",
+    color: '#DBFFE8',
   },
   placeholderStyle: {
     fontSize: 16,
-    color: "#DBFFE8",
+    color: '#DBFFE8',
   },
   selectedTextStyle: {
     fontSize: 16,
-    color: "#DBFFE8",
+    color: '#DBFFE8',
   },
   iconStyle: {
     width: 20,

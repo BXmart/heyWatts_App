@@ -54,7 +54,8 @@ const OwnerDashboardPredictMoneyCard: React.FC<OwnerDashboardPredictMoneyCardPro
 
 const styles = StyleSheet.create({
   card: {
-    height: 150,
+    height: 130,
+    width: 250,
     padding: 16,
     position: 'relative',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',

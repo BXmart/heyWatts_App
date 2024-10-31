@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Dimensions, Text, View, StyleSheet } from "react-native";
-import { Card } from "@/components/ui/Card";
-import useDashboard from "@/hooks/useDashboardHook";
-import { BarColors, GraphType } from "../utils/parseDashboardData";
-import Octicons from "@expo/vector-icons/Octicons";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { ActivityIndicator } from "react-native-paper";
-import EnergyMoneyResume from "./components/EnergyMoneyResume";
-import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
-import MarketPriceGraphs from "./MarketGraph";
-import { BarChart, LineChart } from "react-native-gifted-charts";
-import { Colors } from "../utils/circularTimeRangeUtils";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Dimensions, Text, View, StyleSheet } from 'react-native';
+import { Card } from '@/components/ui/Card';
+import useDashboard from '@/hooks/useDashboardHook';
+import { BarColors, GraphType } from '../utils/parseDashboardData';
+import Octicons from '@expo/vector-icons/Octicons';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ActivityIndicator } from 'react-native-paper';
+import EnergyMoneyResume from './components/EnergyMoneyResume';
+import { EnergyDayPriceI, OwnerDashboardI } from '@/types/OwnerDashboard';
+import MarketPriceGraphs from './MarketGraph';
+import { BarChart, LineChart } from 'react-native-gifted-charts';
+import { Colors } from '../utils/circularTimeRangeUtils';
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 const DashboardGraph = React.memo(
   ({ dashboardData, initialData, currentProperty, marketPrices }: { dashboardData: OwnerDashboardI; initialData: EnergyDayPriceI[]; currentProperty: string | null; marketPrices: any }) => {
@@ -33,7 +33,7 @@ const DashboardGraph = React.memo(
       setCurrentDate((prev: string) => {
         const currentDateObj = new Date(prev);
         currentDateObj.setDate(currentDateObj.getDate() - 1);
-        return currentDateObj.toISOString().split("T")[0];
+        return currentDateObj.toISOString().split('T')[0];
       });
     }, [setCurrentDate]);
 
@@ -41,7 +41,7 @@ const DashboardGraph = React.memo(
       setCurrentDate((prev) => {
         const currentDateObj = new Date(prev);
         currentDateObj.setDate(currentDateObj.getDate() + 1);
-        return currentDateObj.toISOString().split("T")[0];
+        return currentDateObj.toISOString().split('T')[0];
       });
     }, [setCurrentDate]);
 
@@ -54,10 +54,10 @@ const DashboardGraph = React.memo(
         <View style={styles.tooltip}>
           <Text style={styles.tooltipText}>{`${item.label}:00`}</Text>
           <Text style={styles.tooltipText}>
-            {item.frontColor === "#4bbc96" ? (graphType == GraphType.Money ? "Importe Volcado:" : "Energía Volcada:") : graphType == GraphType.Money ? "Importe Consumido:" : "Energía Consumida:"}
+            {item.frontColor === '#4bbc96' ? (graphType == GraphType.Money ? 'Importe Volcado:' : 'Energía Volcada:') : graphType == GraphType.Money ? 'Importe Consumido:' : 'Energía Consumida:'}
             <Text style={styles.boldText}>
               {item.value.toFixed(3)}
-              {graphType == GraphType.Money ? "€/" : ""}kWh
+              {graphType == GraphType.Money ? '€/' : ''}kWh
             </Text>
           </Text>
           {/* <Text style={styles.tooltipText}>
@@ -78,7 +78,7 @@ const DashboardGraph = React.memo(
               <Text style={styles.legendText}>Actual</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendColor, { backgroundColor: "#F29C6E" }]} />
+              <View style={[styles.legendColor, { backgroundColor: '#F29C6E' }]} />
               <Text style={styles.legendText}>Predicción</Text>
             </View>
           </>
@@ -104,7 +104,7 @@ const DashboardGraph = React.memo(
           <View style={styles.headerContainer}>
             <Text style={styles.title}>Energía diaria</Text>
             <View style={styles.segmentedControl}>
-              {["€", "kWh"].map((value, index) => (
+              {['€', 'kWh'].map((value, index) => (
                 <TouchableOpacity key={index} style={[styles.segment, graphType === index && styles.selectedSegment]} onPress={() => setGraphType(index)}>
                   <Text style={[styles.segmentText, graphType === index && styles.selectedSegmentText]}>{value}</Text>
                 </TouchableOpacity>
@@ -114,7 +114,7 @@ const DashboardGraph = React.memo(
 
           {loading ? (
             <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color={"#164E63"} />
+              <ActivityIndicator size="large" color={'#164E63'} />
             </View>
           ) : (
             <>
@@ -124,8 +124,8 @@ const DashboardGraph = React.memo(
                   ...(currentData || initialData),
                   {
                     value: graphType == GraphType.Energy ? minValue : 0,
-                    label: "",
-                    frontColor: "transparent",
+                    label: '',
+                    frontColor: 'transparent',
                   },
                 ]}
                 width={width - 100}
@@ -133,10 +133,10 @@ const DashboardGraph = React.memo(
                 barWidth={22}
                 barBorderRadius={5}
                 xAxisIndicesWidth={1}
-                yAxisColor={"white"}
+                yAxisColor={'white'}
                 yAxisThickness={1}
                 xAxisThickness={1}
-                xAxisLabelTextStyle={{ color: "gray" }}
+                xAxisLabelTextStyle={{ color: 'gray' }}
                 yAxisLabelWidth={20}
                 dashWidth={20}
                 dashGap={10}
@@ -146,16 +146,16 @@ const DashboardGraph = React.memo(
                 noOfSections={graphType == GraphType.Money ? 2 : 4}
                 autoCenterTooltip
                 yAxisTextStyle={{
-                  color: "gray",
+                  color: 'gray',
                   fontSize: 11,
                   marginRight: 0,
                   paddingLeft: 0,
                 }}
                 showLine={graphType === GraphType.Energy}
                 lineConfig={{
-                  color: "#F29C6E",
+                  color: '#F29C6E',
                   thickness: 3,
-                  dataPointsColor: "#F29C6E",
+                  dataPointsColor: '#F29C6E',
                   dataPointsRadius: 5,
                 }}
                 lineData={parsedEnergyPredictionData}
@@ -189,36 +189,36 @@ const DashboardGraph = React.memo(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    backgroundColor: "transparent",
+    flexDirection: 'column',
+    backgroundColor: 'transparent',
   },
   card: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     borderRadius: 15,
     shadowOffset: { width: 0, height: 0 },
-    shadowColor: "transparent",
+    shadowColor: 'transparent',
   },
   headerContainer: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "baseline",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
     gap: 5,
   },
   title: {
-    fontSize: 25,
-    color: "lightgray",
-    fontWeight: "bold",
+    fontSize: 20,
+    color: 'lightgray',
+    fontWeight: 'bold',
   },
   date: {
     fontSize: 15,
-    color: "lightgray",
-    fontWeight: "bold",
+    color: 'lightgray',
+    fontWeight: 'bold',
   },
   segmentedControl: {
-    marginLeft: "auto",
-    flexDirection: "row",
-    backgroundColor: "#164E63",
+    marginLeft: 'auto',
+    flexDirection: 'row',
+    backgroundColor: '#164E63',
     borderRadius: 15,
     padding: 4,
     maxWidth: 98,
@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   selectedSegment: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -241,53 +241,53 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 16,
-    color: "#666666",
+    color: '#666666',
   },
   selectedSegmentText: {
-    color: "#000000",
-    fontWeight: "bold",
+    color: '#000000',
+    fontWeight: 'bold',
   },
   loaderContainer: {
     height: 200,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   navigationContainer: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     padding: 0,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
   },
   navButtonLeft: {
-    backgroundColor: "lightgray",
+    backgroundColor: 'lightgray',
     borderRadius: 70,
     paddingRight: 13,
     paddingLeft: 11,
     paddingVertical: 4,
-    textAlign: "center",
+    textAlign: 'center',
     borderBottomLeftRadius: 100,
     borderBottomRightRadius: 100,
     borderTopLeftRadius: 100,
     borderTopRightRadius: 100,
   },
   navButtonRight: {
-    backgroundColor: "lightgray",
+    backgroundColor: 'lightgray',
     borderRadius: 100,
     paddingRight: 11,
     paddingLeft: 13,
     paddingVertical: 4,
-    textAlign: "center",
+    textAlign: 'center',
     borderBottomLeftRadius: 100,
     borderBottomRightRadius: 100,
     borderTopLeftRadius: 100,
     borderTopRightRadius: 100,
   },
   tooltip: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: 8,
     borderRadius: 4,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -299,29 +299,29 @@ const styles = StyleSheet.create({
   },
   tooltipText: {
     fontSize: 12,
-    color: "#64748B",
+    color: '#64748B',
   },
   boldText: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   yAxisTextStyle: {
-    color: "gray",
+    color: 'gray',
     fontSize: 11,
     marginRight: 0,
     paddingLeft: 0,
   },
   xAxisLabelTextStyle: {
-    color: "gray",
+    color: 'gray',
   },
   legendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 10,
   },
   legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 5,
     marginHorizontal: 10,
   },
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 12,
-    color: "gray",
+    color: 'gray',
   },
 });
 

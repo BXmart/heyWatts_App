@@ -113,7 +113,7 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
       <Modal isVisible={visibleHelp.isOpen} onBackdropPress={() => setVisibleHelp({ isOpen: false, data: null })} style={styles.modal}>
         {renderModalContent()}
       </Modal>
-      <ScrollView horizontal showsHorizontalScrollIndicator={true} indicatorStyle="white">
+      <ScrollView horizontal showsHorizontalScrollIndicator={true} indicatorStyle="white" style={{ paddingBottom: 0 }}>
         {/*  {(hasMeterDevices || hasBattery || hasInverter) && (
           <View style={styles.slide}>
             <PropertyInfograph data={data} hasBattery={hasBattery} hasInverter={hasInverter} />
@@ -148,13 +148,11 @@ const styles = StyleSheet.create({
   slide: {
     padding: 5,
     width: 'auto',
-    maxWidth: width / 2,
     paddingHorizontal: 5,
   },
   errorCard: {
     height: 140,
     padding: 16,
-    marginBottom: 16,
   },
   errorTitle: {
     fontSize: 14,
@@ -184,17 +182,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#64748B',
-    marginBottom: 16,
   },
   modalGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 16,
   },
-  modalRow: {
-    marginBottom: 8,
-  },
+  modalRow: {},
   modalValue: {
     fontSize: 14,
     fontWeight: '500',

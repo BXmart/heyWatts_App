@@ -9,8 +9,8 @@ const DottedLine = ({
   direction = 'horizontal',
   duration = 2000,
   reverse = false,
-  numberOfDots = 6, // Increased default number of dots
-  isLoading = true,
+  numberOfDots = 6,
+  isLoading = false, // Changed default to false
 }) => {
   const animatedValues = useRef(
     Array(numberOfDots)
@@ -19,34 +19,31 @@ const DottedLine = ({
   ).current;
 
   useEffect(() => {
+    // Stop any existing animations
     animatedValues.forEach((value) => value.stopAnimation());
 
     if (!isLoading) {
-      // Calculate shorter duration for smoother movement
+      // Changed condition to run animation when NOT loading
       const dotDuration = duration * 0.8;
-      // Reduced delay between dots for closer spacing
       const delayBetweenDots = dotDuration / (numberOfDots * 2);
 
-      const animations = animatedValues.map((value, index) =>
-        Animated.sequence([
-          // Reset position
+      const animations = animatedValues.map((value, index) => {
+        return Animated.sequence([
           Animated.timing(value, {
             toValue: 0,
             duration: 0,
             useNativeDriver: true,
           }),
-          // Add initial delay based on dot position
           Animated.delay(delayBetweenDots * index),
-          // Animate to end
           Animated.timing(value, {
             toValue: 1,
             duration: dotDuration,
             useNativeDriver: true,
           }),
-        ])
-      );
+        ]);
+      });
 
-      // Start the animation loop with staggered timing
+      // Run animations in parallel with staggered delays
       Animated.loop(Animated.stagger(delayBetweenDots, animations)).start();
     }
 
@@ -58,38 +55,36 @@ const DottedLine = ({
   const containerStyle = {
     width: direction === 'horizontal' ? length : dotSize,
     height: direction === 'vertical' ? length : dotSize,
+    backgroundColor: 'transparent', // Added for visibility
   };
 
   const createDotStyle = (animValue) => {
+    const moveDistance = length - dotSize;
+
     const dotPosition = animValue.interpolate({
       inputRange: [0, 1],
-      outputRange: reverse ? [length - dotSize, 0] : [0, length - dotSize],
+      outputRange: reverse ? [moveDistance, 0] : [0, moveDistance],
     });
 
-    // Adjusted opacity interpolation for smoother fade
     const dotOpacity = animValue.interpolate({
-      inputRange: [0, 0.1, 0.9, 1],
+      inputRange: [0, 0.2, 0.8, 1],
       outputRange: [0, 1, 1, 0],
     });
 
-    // Calculate smaller dot size when more dots are present
     const adjustedDotSize = Math.min(dotSize, length / (numberOfDots * 1.5));
 
     return {
+      position: 'absolute',
       width: adjustedDotSize,
       height: adjustedDotSize,
       borderRadius: adjustedDotSize / 2,
       backgroundColor: dotColor,
-      position: 'absolute',
       opacity: dotOpacity,
       transform: [direction === 'horizontal' ? { translateX: dotPosition } : { translateY: dotPosition }],
     };
   };
 
-  if (isLoading) {
-    return <View style={[styles.container, containerStyle, style]} />;
-  }
-
+  // Removed the isLoading condition check here
   return (
     <View style={[styles.container, containerStyle, style]}>
       {animatedValues.map((value, index) => (
@@ -102,7 +97,7 @@ const DottedLine = ({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    overflow: 'hidden', // Prevent dots from showing outside container
+    overflow: 'hidden',
   },
 });
 

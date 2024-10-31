@@ -41,8 +41,9 @@ const OwnerDashboardTodayMoneyCard = ({ invoiceData, openModal }: any) => {
 
 const styles = StyleSheet.create({
   card: {
-    height: 150,
+    height: 130,
     padding: 16,
+    width: 250,
     position: 'relative',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     shadowColor: 'transparent',

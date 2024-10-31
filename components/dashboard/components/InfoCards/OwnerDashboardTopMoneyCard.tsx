@@ -77,7 +77,8 @@ const OwnerDashboardTopMoneyConsumedCard = ({ invoiceData }: { invoiceData: Invo
 
 const styles = StyleSheet.create({
   card: {
-    height: 150,
+    height: 130,
+    width: 250,
     padding: 16,
     position: 'relative',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   mainNumber: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: '500',
     marginBottom: -8,
   },
