@@ -8,6 +8,7 @@ import { getFeeTypeName } from '@/utils/getFeeTypeName';
 import { formatInvoiceDate } from '@/utils/formatInvoiceDate';
 import { roundNumber } from '@/utils/roundedNumber';
 import { FontAwesome6, Feather } from '@expo/vector-icons';
+import UnderstandYourBillCTA from '@/components/common/UnderstandYourBillCTA';
 
 const styles = StyleSheet.create({
   container: {
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const ContractedPowerTable = ({ data }) => {
+const ContractedPowerTable = ({ data }: any) => {
   const tableData = [];
 
   if (data.powerKW) {
@@ -175,7 +176,7 @@ const ContractedPowerTable = ({ data }) => {
   );
 };
 
-const ConsumedEnergyTable = ({ data }) => {
+const ConsumedEnergyTable = ({ data }: any) => {
   const getEnergyTableData = () => {
     if (!data.energyConsumed) {
       return [
@@ -230,7 +231,7 @@ const ConsumedEnergyTable = ({ data }) => {
       </View>
 
       {data.energyExported !== 0 && data.t_c !== 0 && (
-        <>
+        <View>
           <Text style={styles.sectionDescription}>
             Dispone de un <Text style={styles.highlight}>sistema de autoconsumo</Text>, y estos son los datos recogidos en esta factura:
           </Text>
@@ -244,7 +245,7 @@ const ConsumedEnergyTable = ({ data }) => {
               <Text style={[styles.cell, styles.cellData]}>{`${data.t_c} €/kWh`}</Text>
             </View>
           </View>
-        </>
+        </View>
       )}
     </View>
   );
@@ -261,7 +262,7 @@ export default function InvoicesPage() {
     }
   }, [invoicesData]);
 
-  const selectedInvoice = invoicesData?.find((invoice) => invoice._id === selectedInvoiceId);
+  const selectedInvoice = invoicesData?.find((invoice: any) => invoice._id === selectedInvoiceId);
 
   if (!invoicesData || invoicesData.length === 0) {
     return (
@@ -275,12 +276,11 @@ export default function InvoicesPage() {
     <ScrollView style={styles.container}>
       <View style={styles.pickerContainer}>
         <Picker selectedValue={selectedInvoiceId} onValueChange={(itemValue) => setSelectedInvoiceId(itemValue)} style={styles.picker}>
-          {invoicesData.map((invoice) => (
+          {invoicesData.map((invoice: any) => (
             <Picker.Item key={invoice._id} label={`Factura de ${formatInvoiceDate(invoice.invoiceDate)} - ${(invoice.total ?? 0).toFixed(2)}€`} value={invoice._id} />
           ))}
         </Picker>
       </View>
-
       {selectedInvoice && (
         <View style={styles.card}>
           <View style={styles.headerRow}>
@@ -303,6 +303,7 @@ export default function InvoicesPage() {
           <ConsumedEnergyTable data={selectedInvoice} />
         </View>
       )}
+      <UnderstandYourBillCTA />
     </ScrollView>
   );
 }

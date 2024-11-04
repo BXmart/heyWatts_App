@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Dimensions, Text, View, StyleSheet } from 'react-native';
+import { Dimensions, Text, View, StyleSheet, useWindowDimensions } from 'react-native';
 import { Card } from '@/components/ui/Card';
 import useDashboard from '@/hooks/useDashboardHook';
 import { BarColors, GraphType } from '../utils/parseDashboardData';
@@ -11,11 +11,11 @@ import { EnergyDayPriceI, OwnerDashboardI } from '@/types/OwnerDashboard';
 import MarketPriceGraphs from './MarketGraph';
 import { BarChart, LineChart } from 'react-native-gifted-charts';
 import { Colors } from '../utils/circularTimeRangeUtils';
-
-const { width } = Dimensions.get('window');
+import { transform } from '@babel/core';
 
 const DashboardGraph = React.memo(
   ({ dashboardData, initialData, currentProperty, marketPrices }: { dashboardData: OwnerDashboardI; initialData: EnergyDayPriceI[]; currentProperty: string | null; marketPrices: any }) => {
+    const { width } = useWindowDimensions();
     const { graphType, parsedEnergyData, parsedEnergyPredictionData, parsedMoneyData, originalEnergyData, originalMoneyData, loading, setGraphType, setCurrentDate, currentDate, setPropertyId } =
       useDashboard();
     const [isPointerShown, setIsPointerShown] = useState(false);
@@ -46,7 +46,6 @@ const DashboardGraph = React.memo(
     }, [setCurrentDate]);
 
     const maxValue = Math.max(...currentData.map((item) => item.value), ...(graphType === GraphType.Energy ? parsedEnergyPredictionData.map((item) => item.value) : []));
-
     const minValue = Math.min(...currentData.map((item) => item.value), ...parsedEnergyPredictionData.map((item) => item.value));
 
     const renderTooltip = (item: any) => {
@@ -60,9 +59,6 @@ const DashboardGraph = React.memo(
               {graphType == GraphType.Money ? '€/' : ''}kWh
             </Text>
           </Text>
-          {/* <Text style={styles.tooltipText}>
-            Predicción de consumo: <Text style={styles.boldText}>{item.value.toFixed(3)}€/kWh</Text>
-          </Text> */}
         </View>
       );
     };
@@ -98,6 +94,8 @@ const DashboardGraph = React.memo(
       return <Text>Waiting for data...</Text>;
     }
 
+    const chartWidth = width - 32; // Subtract padding/margins
+
     return (
       <View style={styles.container}>
         <Card style={styles.card}>
@@ -117,7 +115,7 @@ const DashboardGraph = React.memo(
               <ActivityIndicator size="large" color={'#164E63'} />
             </View>
           ) : (
-            <>
+            <View style={styles.graphContainer}>
               <BarChart
                 maxValue={maxValue}
                 backgroundColor={'#0F242A'}
@@ -129,16 +127,17 @@ const DashboardGraph = React.memo(
                     frontColor: 'transparent',
                   },
                 ]}
-                width={width - 100}
+                width={chartWidth}
                 height={200}
-                barWidth={22}
+                barWidth={Math.min(22, (chartWidth - 40) / 24)} // Dynamically calculate bar width
+                spacing={Math.min(8, (chartWidth - 40) / 48)} // Dynamic spacing between bars
                 barBorderRadius={5}
                 xAxisIndicesWidth={1}
                 yAxisColor={'white'}
                 yAxisThickness={1}
                 xAxisThickness={1}
-                xAxisLabelTextStyle={{ color: 'gray' }}
-                yAxisLabelWidth={20}
+                xAxisLabelTextStyle={{ color: 'gray', width: 50, transform: 'rotate(45deg)', fontSize: 10 }}
+                yAxisLabelWidth={10}
                 dashWidth={20}
                 dashGap={10}
                 lineBehindBars
@@ -149,8 +148,6 @@ const DashboardGraph = React.memo(
                 yAxisTextStyle={{
                   color: 'gray',
                   fontSize: 11,
-                  marginRight: 0,
-                  paddingLeft: 0,
                 }}
                 showLine={graphType === GraphType.Energy}
                 lineConfig={{
@@ -162,23 +159,24 @@ const DashboardGraph = React.memo(
                 lineData={parsedEnergyPredictionData}
               />
               <Legend graphType={graphType} />
-            </>
+            </View>
           )}
           <View style={styles.navigationContainer}>
-            <TouchableOpacity onPress={handlePreviousDay}>
-              <View style={styles.navButtonLeft}>
-                <Octicons name="chevron-left" size={24} color="black" />
-              </View>
-            </TouchableOpacity>
-            <Text style={styles.date}>Día: {currentDate}</Text>
-            <TouchableOpacity onPress={handleNextDay} disabled={graphType == GraphType.Money ? new Date(currentDate) >= TODAY : false} activeOpacity={0}>
-              <View style={styles.navButtonRight}>
-                <Octicons name="chevron-right" size={24} color="black" />
-              </View>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignContent: 'space-between', justifyContent: 'space-between', width: '100%', flex: 1 }}>
+              <TouchableOpacity onPress={handlePreviousDay}>
+                <View style={styles.navButtonLeft}>
+                  <Octicons name="chevron-left" size={24} color="black" />
+                </View>
+              </TouchableOpacity>
+              <Text style={styles.date}>Día: {currentDate}</Text>
+              <TouchableOpacity onPress={handleNextDay} disabled={graphType == GraphType.Money ? new Date(currentDate) >= TODAY : false} activeOpacity={0}>
+                <View style={styles.navButtonRight}>
+                  <Octicons name="chevron-right" size={24} color="black" />
+                </View>
+              </TouchableOpacity>
+            </View>
+            {dashboardData && originalEnergyData && <EnergyMoneyResume data={dashboardData} dateData={originalEnergyData} currentGraphMode={graphType} showPredictions={true} hasInverter={true} />}
           </View>
-
-          {dashboardData && originalEnergyData && <EnergyMoneyResume data={dashboardData} dateData={originalEnergyData} currentGraphMode={graphType} showPredictions={true} hasInverter={true} />}
         </Card>
 
         {marketPrices && <MarketPriceGraphs data={dashboardData} energyPrice={marketPrices} energyCompPrice={marketPrices.energyCompPrice} currentDate={currentDate} setCurrentDate={setCurrentDate} />}
@@ -189,23 +187,32 @@ const DashboardGraph = React.memo(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'column',
     borderRadius: 8,
     gap: 4,
+    padding: 0,
   },
   card: {
+    flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 15,
     shadowOffset: { width: 0, height: 0 },
     shadowColor: 'transparent',
+    padding: 0,
+  },
+  graphContainer: {
+    flex: 1,
+    alignItems: 'flex-start',
+    borderRadius: 8,
   },
   headerContainer: {
-    flex: 1,
+    paddingLeft: 16,
+    paddingRight: 5,
+    paddingVertical: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    gap: 5,
+    width: '100%',
   },
   title: {
     fontSize: 20,
@@ -255,11 +262,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   navigationContainer: {
-    flex: 1,
-    flexDirection: 'row',
+    padding: 16,
+    flexDirection: 'column',
     justifyContent: 'space-between',
-    padding: 0,
-    backgroundColor: 'transparent',
+    alignItems: 'center',
+    marginTop: 16,
   },
   navButtonLeft: {
     backgroundColor: 'lightgray',
@@ -268,10 +275,6 @@ const styles = StyleSheet.create({
     paddingLeft: 11,
     paddingVertical: 4,
     textAlign: 'center',
-    borderBottomLeftRadius: 100,
-    borderBottomRightRadius: 100,
-    borderTopLeftRadius: 100,
-    borderTopRightRadius: 100,
   },
   navButtonRight: {
     backgroundColor: 'lightgray',
@@ -280,10 +283,6 @@ const styles = StyleSheet.create({
     paddingLeft: 13,
     paddingVertical: 4,
     textAlign: 'center',
-    borderBottomLeftRadius: 100,
-    borderBottomRightRadius: 100,
-    borderTopLeftRadius: 100,
-    borderTopRightRadius: 100,
   },
   tooltip: {
     backgroundColor: 'white',
@@ -297,7 +296,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    top: 100,
   },
   tooltipText: {
     fontSize: 12,
@@ -305,15 +303,6 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: 'bold',
-  },
-  yAxisTextStyle: {
-    color: 'gray',
-    fontSize: 11,
-    marginRight: 0,
-    paddingLeft: 0,
-  },
-  xAxisLabelTextStyle: {
-    color: 'gray',
   },
   legendContainer: {
     flexDirection: 'row',

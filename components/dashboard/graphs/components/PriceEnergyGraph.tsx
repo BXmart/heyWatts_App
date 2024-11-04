@@ -1,13 +1,13 @@
-import { EnergyDayPriceI } from "@/types/OwnerDashboard";
-import React, { useEffect, useState, memo } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { BarChart } from "react-native-gifted-charts";
+import { EnergyDayPriceI } from '@/types/OwnerDashboard';
+import React, { useEffect, useState, memo } from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { BarChart } from 'react-native-gifted-charts';
 
 interface PriceEnergyGraphProps {
   data: EnergyDayPriceI[];
 }
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
   const [parsedData, setParsedData] = useState<any[]>([]);
@@ -19,7 +19,7 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
         .map((item) => ({
           value: parseFloat(item.price.toFixed(2)),
           label: new Date(item.datetime).getHours().toString(),
-          frontColor: item.tip ? "#ef4444" : item.flat ? "#fb923c" : item.valley ? "#22C55E" : "#94a3b8",
+          frontColor: item.tip ? '#ef4444' : item.flat ? '#fb923c' : item.valley ? '#22C55E' : '#94a3b8',
           topLabelComponent: () => <Text style={styles.topLabel}>{item.price.toFixed(3)}</Text>,
         }));
       setParsedData(sortedData);
@@ -30,10 +30,10 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
     return (
       <View
         style={{
-          position: "absolute",
+          position: 'absolute',
           bottom: 40,
           marginLeft: -12,
-          backgroundColor: "#164E63",
+          backgroundColor: '#164E63',
           paddingHorizontal: 6,
           paddingVertical: 4,
           borderRadius: 4,
@@ -59,7 +59,7 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
         xAxisIndicesWidth={1}
         yAxisThickness={0}
         xAxisThickness={0}
-        xAxisLabelTextStyle={{ color: "gray" }}
+        xAxisLabelTextStyle={{ color: 'gray', width: 50, transform: 'rotate(45deg)', fontSize: 10 }}
         yAxisLabelWidth={20}
         isAnimated
         animationDuration={75}
@@ -70,6 +70,7 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
         noOfSections={5}
         maxValue={Math.max(...parsedData.map((item) => item.value))}
         yAxisLabelSuffix="€/kWh"
+        autoCenterTooltip
         renderTooltip={renderTooltip}
       />
     </View>
@@ -78,23 +79,23 @@ const PriceEnergyGraph: React.FC<PriceEnergyGraphProps> = memo(({ data }) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 24,
   },
   topLabel: {
     fontSize: 8,
-    color: "#64748B",
+    color: '#64748B',
     marginBottom: 4,
   },
   yAxisText: {
-    color: "#64748B",
+    color: '#64748B',
     fontSize: 10,
   },
   tooltip: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: 8,
     borderRadius: 4,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -105,10 +106,10 @@ const styles = StyleSheet.create({
   },
   tooltipText: {
     fontSize: 12,
-    color: "#64748B",
+    color: '#64748B',
   },
   boldText: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 
