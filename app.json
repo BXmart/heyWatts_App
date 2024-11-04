@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "heyWatts",
-    "slug": "heyWatts",
+    "slug": "heyWattsApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/branding/hw-iso-hor-color-01.png",
