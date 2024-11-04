@@ -1,6 +1,7 @@
 /* export const IS_IN_PRODUCTION = import.meta.env.MODE === 'production'; */
 
-export const API_URL =/*  IS_IN_PRODUCTION ? 'https://api.heywatts.es' : */ 'http://heywatts-core.heywatts.svc.cluster.local:8080';
+/*  export const API_URL =IS_IN_PRODUCTION ? 'https://api.heywatts.es' :  'http://heywatts-core.heywatts.svc.cluster.local:8080';*/
+export const API_URL = 'https://api.heywatts.es'
 
 export const ROLES = {
   OWNER: 'OWNER',
