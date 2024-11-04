@@ -115,12 +115,9 @@ const PropertyGraph = React.memo(() => {
   const renderGraph = (isLandscape = false) => {
     if (parsedData.length === 0) return null;
 
-    const graphWidth = isLandscape ? WINDOW_WIDTH : WINDOW_WIDTH * 3;
-    const graphHeight = isLandscape ? WINDOW_HEIGHT * 0.8 : WINDOW_HEIGHT * 0.4;
-
     return (
       <View style={styles.graphWrapper}>
-        <CustomAreaChart data={parsedData} height={graphHeight} width={graphWidth} showGrid={true} showLabels={true} backgroundColor="#083344" paddingHorizontal={20} paddingVertical={20} />
+        <CustomAreaChart data={parsedData} showGrid={true} showLabels={true} backgroundColor="#083344" paddingHorizontal={20} paddingVertical={20} />
       </View>
     );
   };

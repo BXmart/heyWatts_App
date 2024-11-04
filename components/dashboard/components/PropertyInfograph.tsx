@@ -127,10 +127,10 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter, isLoading }: { data:
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    width: width / 2.7,
     height: '100%',
     padding: 5,
-    justifyContent: 'center',
+    paddingTop: 24,
+    justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 8,

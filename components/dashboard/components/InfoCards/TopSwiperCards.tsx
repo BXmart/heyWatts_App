@@ -143,12 +143,12 @@ const TopSwiperCards: React.FC<TopSwiperCardsProps> = ({ data, hasMeterDevices }
 
 const styles = StyleSheet.create({
   container: {
-    height: 180,
+    height: 140,
   },
   slide: {
     padding: 5,
     width: 'auto',
-    paddingHorizontal: 5,
+    paddingHorizontal: 3,
   },
   errorCard: {
     height: 140,

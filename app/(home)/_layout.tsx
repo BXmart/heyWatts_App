@@ -143,6 +143,13 @@ export default function HomeLayout() {
             tabBarIcon: ({ color }) => <Fontisto name="lightbulb" size={24} color="#DBFFE8" />,
           }}
         />
+        <Tabs.Screen
+          name="invoices"
+          options={{
+            title: 'Facturas',
+            tabBarIcon: ({ color }) => <FontAwesome6 name="file-invoice" size={24} color="#DBFFE8" />,
+          }}
+        />
       </Tabs>
     </TabsProvider>
   );

@@ -1,15 +1,15 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import DashboardGraph from "./graphs/DashboardGraph";
-import useAuthStore from "@/stores/useAuthStore";
-import useDashboard from "@/hooks/useDashboardHook";
-import { getOwnerInvoice, InvoiceData } from "@/services/dashboard.service";
-import TopSwiperCards from "./components/InfoCards/TopSwiperCards";
-import MarketPriceGraphs from "./graphs/MarketGraph";
-import { analyzeCompPrices, analyzeEnergyPrices } from "./utils/circularTimeRangeUtils";
-import CircularTimeRangesSwiper from "./components/CircularTimeRange/CircularTimeRangesSwiper.component";
-import PropertyInfograph from "./components/PropertyInfograph";
-import { PagedPropertiesResponseI } from "@/context/TabsContext";
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import DashboardGraph from './graphs/DashboardGraph';
+import useAuthStore from '@/stores/useAuthStore';
+import useDashboard from '@/hooks/useDashboardHook';
+import { getOwnerInvoice, InvoiceData } from '@/services/dashboard.service';
+import TopSwiperCards from './components/InfoCards/TopSwiperCards';
+import MarketPriceGraphs from './graphs/MarketGraph';
+import { analyzeCompPrices, analyzeEnergyPrices } from './utils/circularTimeRangeUtils';
+import CircularTimeRangesSwiper from './components/CircularTimeRange/CircularTimeRangesSwiper.component';
+import PropertyInfograph from './components/PropertyInfograph';
+import { PagedPropertiesResponseI } from '@/context/TabsContext';
 
 const OwnerDashboard = ({
   consumptionData,
@@ -46,7 +46,7 @@ const OwnerDashboard = ({
 
   if (isLoading || !user) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Loading...</Text>
       </View>
     );
@@ -57,11 +57,11 @@ const OwnerDashboard = ({
 
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
-      <View style={{ flex: 1, flexDirection: "row", alignItems: "start", height: 220, gap: 5 }}>
+      <View style={{ flex: 1, flexDirection: 'row', height: 220, gap: 5 }}>
         <PropertyInfograph data={dashboardData} hasBattery={hasBattery} hasInverter={hasInverter} isLoading={isLoading} />
         <CircularTimeRangesSwiper energySlots={energySlots} compSlots={compSlots} showCompSlots={hasInverter} />
       </View>
-      {<TopSwiperCards data={dashboardData} hasMeterDevices={true} />}
+      <TopSwiperCards data={dashboardData} hasMeterDevices={true} />
       <DashboardGraph dashboardData={dashboardData} initialData={consumptionData} currentProperty={currentProperty} marketPrices={marketPrices} />
     </ScrollView>
   );
@@ -70,22 +70,22 @@ const OwnerDashboard = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    gap: 10,
-    justifyContent: "flex-start",
-    backgroundColor: "#f5f5f5",
+    flexDirection: 'row',
+    height: 220,
+    gap: 5,
   },
   scrollView: {
     flexGrow: 1,
+    padding: 5,
   },
   subtitle: {
     fontSize: 12,
-    color: "#64748B",
+    color: '#64748B',
   },
   header: {},
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 

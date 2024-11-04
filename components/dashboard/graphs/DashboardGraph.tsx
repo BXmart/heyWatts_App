@@ -120,6 +120,7 @@ const DashboardGraph = React.memo(
             <>
               <BarChart
                 maxValue={maxValue}
+                backgroundColor={'#0F242A'}
                 data={[
                   ...(currentData || initialData),
                   {
@@ -190,10 +191,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: 'transparent',
+    borderRadius: 8,
+    gap: 4,
   },
   card: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 15,
     shadowOffset: { width: 0, height: 0 },
     shadowColor: 'transparent',

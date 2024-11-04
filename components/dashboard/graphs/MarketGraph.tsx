@@ -1,199 +1,218 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Card, Button } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import moment from "moment";
-import useAuthStore from "@/stores/useAuthStore";
-import { getEnergyPricesByPropertyId } from "@/services/dashboard.service";
-import { getEnergyCompensationPricesByPropertyId } from "@/services/properties.service";
-import { URLS } from "@/utils/constants";
-import PriceEnergyGraph from "./components/PriceEnergyGraph";
-import ExcessCompensationGraph from "./components/ExcessCompensationGraph";
-import { EnergyDayPriceI, OwnerDashboardI } from "@/types/OwnerDashboard";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { Card } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
+import useAuthStore from '@/stores/useAuthStore';
+import { getEnergyPricesByPropertyId } from '@/services/dashboard.service';
+import { getEnergyCompensationPricesByPropertyId } from '@/services/properties.service';
+import PriceEnergyGraph from './components/PriceEnergyGraph';
+import ExcessCompensationGraph from './components/ExcessCompensationGraph';
+import { EnergyDayPriceI, OwnerDashboardI } from '@/types/OwnerDashboard';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 
 interface MarketPriceGraphsProps {
   data: OwnerDashboardI;
   energyPrice: EnergyDayPriceI[];
   energyCompPrice: EnergyDayPriceI[];
   currentDate: string;
-  setCurrentDate: (string: string) => void;
+  setCurrentDate: (date: string) => void;
 }
 
 const MarketPriceGraphs: React.FC<MarketPriceGraphsProps> = ({ data, energyPrice, energyCompPrice, currentDate, setCurrentDate }) => {
-  const [visibleHelp, setVisibleHelp] = useState(false);
+  const [helpVisible, setHelpVisible] = useState(false);
   const [energyPriceState, setEnergyPriceState] = useState(energyPrice);
   const [energyCompPriceState, setEnergyCompPriceState] = useState(energyCompPrice);
-  const { user } = useAuthStore();
-  const navigation = useNavigation();
   const [graphMode, setGraphMode] = useState(0);
 
-  const hasBattery = data?.deviceDashboard?.batteries !== 0;
+  const { user } = useAuthStore();
   const hasInverter = data?.deviceDashboard?.inverterHuawei !== 0 || data?.deviceDashboard?.inverterFronius !== 0;
 
-  const getDate = () => {
-    if (currentDate > moment().format("YYYY-MM-DD")) {
-      return "hoy";
-    }
-    return currentDate === moment().format("YYYY-MM-DD") ? "hoy" : currentDate;
-  };
-
-  const handleOnChange = (number: number) => {
-    setGraphMode(number);
-  };
-
-  const handleClickToday = () => {
-    setCurrentDate(moment().format("YYYY-MM-DD"));
+  const getDisplayDate = () => {
+    const today = moment().format('YYYY-MM-DD');
+    if (currentDate > today) return 'hoy';
+    return currentDate === today ? 'hoy' : moment(currentDate).format('DD/MM/YYYY');
   };
 
   useEffect(() => {
-    const fetchEnergyPrices = async () => {
-      const data = await getEnergyPricesByPropertyId(user?.user.propertyByDefault?._id!, moment(new Date(currentDate).setHours(0, 0, 0, 0)).format("YYYY-MM-DD HH:mm:ss"));
-      setEnergyPriceState(data);
-    };
-    if (currentDate <= moment().format("YYYY-MM-DD")) {
-      fetchEnergyPrices();
-    }
-  }, [currentDate]);
+    const fetchPrices = async () => {
+      if (currentDate > moment().format('YYYY-MM-DD')) return;
 
-  useEffect(() => {
-    const fetchEnergyCompPrices = async () => {
-      const data = await getEnergyCompensationPricesByPropertyId(user?.user.propertyByDefault?._id!, moment(new Date(currentDate).setHours(0, 0, 0, 0)).format("YYYY-MM-DD HH:mm:ss"));
-      setEnergyCompPriceState(data);
+      const formattedDate = moment(new Date(currentDate)).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+
+      const [energyPrices, compPrices] = await Promise.all([
+        getEnergyPricesByPropertyId(user?.user.propertyByDefault?._id!, formattedDate),
+        getEnergyCompensationPricesByPropertyId(user?.user.propertyByDefault?._id!, formattedDate),
+      ]);
+
+      setEnergyPriceState(energyPrices);
+      setEnergyCompPriceState(compPrices);
     };
-    if (currentDate <= moment().format("YYYY-MM-DD")) {
-      fetchEnergyCompPrices();
-    }
-  }, [currentDate]);
+
+    fetchPrices();
+  }, [currentDate, user?.user.propertyByDefault?._id]);
+
+  const renderHelpTooltip = () => (
+    <View style={styles.tooltipContainer}>
+      <View style={styles.tooltip}>
+        <Text style={styles.tooltipText}>Los datos mostrados son el resultado del mercado diario ajustados a tu tarifa en €/kWh.</Text>
+      </View>
+      <View style={styles.tooltipArrow} />
+    </View>
+  );
+
+  const renderNoData = () => (
+    <View style={styles.noDataContainer}>
+      <Ionicons name="stats-chart-outline" size={48} color="#9CA3AF" />
+      <Text style={styles.noDataText}>No se han obtenido datos sobre el precio de la luz. Por favor, inténtelo más tarde.</Text>
+    </View>
+  );
 
   return (
-    <Card style={(styles.card, { backgroundColor: "transparent", shadowColor: "transparent" })}>
-      <TouchableOpacity style={styles.helpIcon} onPress={() => setVisibleHelp(!visibleHelp)}>
-        <Ionicons name="help-circle-outline" size={24} color={visibleHelp ? "#10B981" : "#9CA3AF"} />
+    <Card style={styles.card}>
+      <TouchableOpacity style={styles.helpButton} onPress={() => setHelpVisible(!helpVisible)}>
+        <Ionicons name="help-circle-outline" size={24} color={helpVisible ? '#10B981' : '#9CA3AF'} />
       </TouchableOpacity>
-      {visibleHelp && (
-        <View style={styles.popup}>
-          <Text style={styles.popupText}>Los datos mostrados son el resultado del mercado diario ajustados a tu tarifa en €/kWh.</Text>
-        </View>
-      )}
-      <View>
-        <Text style={styles.title}>{graphMode === 0 ? `Precio de la luz de ${getDate()}` : `Comp. Excedentes de ${getDate()}`}</Text>
-        {energyPrice.length < 0 ? (
-          <View style={styles.noDataContainer}>
-            <Ionicons name="stats-chart-outline" size={48} color="#9CA3AF" />
-            <Text style={styles.noDataText}>No se han obtenido datos sobre el precio de la luz. Por favor, inténtelo más tarde.</Text>
-          </View>
+
+      {helpVisible && renderHelpTooltip()}
+
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>{graphMode === 0 ? `Precio de la luz de ${getDisplayDate()}` : `Compensación por excedentes de ${getDisplayDate()}`}</Text>
+
+        {energyPrice.length === 0 ? (
+          renderNoData()
         ) : (
           <>
             {hasInverter && (
-              <SegmentedControl
-                values={["Precio de la luz", "Comp. por excedentes"]}
-                selectedIndex={graphMode}
-                onChange={(event) => {
-                  handleOnChange(event.nativeEvent.selectedSegmentIndex);
-                }}
-              />
+              <View style={styles.segmentedControlContainer}>
+                <SegmentedControl
+                  values={['Precio de la luz', 'Comp. por excedentes']}
+                  selectedIndex={graphMode}
+                  onChange={(event) => {
+                    setGraphMode(event.nativeEvent.selectedSegmentIndex);
+                  }}
+                  style={styles.segmentedControl}
+                />
+              </View>
             )}
-            {graphMode === 0 ? <PriceEnergyGraph data={energyPriceState} /> : <ExcessCompensationGraph data={energyCompPriceState} />}
-            <Text style={styles.infoText}>
-              <Text style={styles.boldText}>¿Has visto el precio de la luz de hoy?</Text> Compruebe los tramos de precio más bajos para optimizar su consumo.
-            </Text>
+
+            <View style={styles.graphContainer}>{graphMode === 0 ? <PriceEnergyGraph data={energyPriceState} /> : <ExcessCompensationGraph data={energyCompPriceState} />}</View>
+
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoText}>
+                <Text style={styles.infoHighlight}>¿Has visto el precio de la luz de hoy?</Text> Compruebe los tramos de precio más bajos para optimizar su consumo.
+              </Text>
+            </View>
           </>
         )}
       </View>
-
-      {/* <View style={styles.buttonContainer}>
-        <Button mode="contained" onPress={handleClickToday} style={styles.button}>
-          Ver precios de hoy
-        </Button>
-        {user?.user.propertyByDefault && (
-          <Button mode="contained" onPress={() => navigation.navigate(URLS.APP_OWNER_UNDERSTAND_BILL)} style={styles.button}>
-            Entiende tu factura
-          </Button>
-        )}
-      </View> */}
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    padding: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    elevation: 0,
+    shadowColor: 'transparent',
+  },
+  contentContainer: {
+    backgroundColor: 'transparent',
+    borderRadius: 16,
+    overflow: 'hidden',
+    padding: 20,
     minHeight: 460,
+    elevation: 0,
+    shadowColor: 'transparent',
   },
-  helpIcon: {
-    position: "absolute",
-    top: 20,
-    right: 20,
+  helpButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 2,
+    padding: 4,
   },
-  popup: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 5,
-    elevation: 3,
-    zIndex: 1,
+  tooltipContainer: {
+    position: 'absolute',
+    top: 48,
+    right: 16,
+    zIndex: 3,
+    width: 240,
   },
-  popupText: {
-    fontSize: 12,
-    color: "#64748B",
+  tooltip: {
+    backgroundColor: 'white',
+    padding: 12,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  tooltipArrow: {
+    position: 'absolute',
+    top: -8,
+    right: 12,
+    width: 0,
+    height: 0,
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderBottomWidth: 8,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'white',
+  },
+  tooltipText: {
+    fontSize: 13,
+    color: '#4B5563',
+    lineHeight: 18,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: "#64748B",
-    marginBottom: 16,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    marginBottom: 20,
+  },
+  segmentedControlContainer: {
+    marginBottom: 20,
+  },
+  segmentedControl: {
+    height: 40,
+  },
+  graphContainer: {
+    flex: 1,
+    minHeight: 280,
+    marginBottom: 20,
+    backgroundColor: '#0F242A',
   },
   noDataContainer: {
-    height: 200,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   noDataText: {
-    fontSize: 14,
-    color: "#9CA3AF",
-    textAlign: "center",
+    fontSize: 15,
+    color: '#9CA3AF',
+    textAlign: 'center',
     marginTop: 16,
+    lineHeight: 22,
   },
-  tabsContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 16,
-  },
-  tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    marginLeft: 8,
-  },
-  activeTab: {
-    backgroundColor: "#10B981",
-  },
-  tabText: {
-    fontSize: 12,
-    color: "#64748B",
-  },
-  activeTabText: {
-    color: "white",
+  infoContainer: {
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 'auto',
   },
   infoText: {
     fontSize: 14,
-    color: "#64748B",
-    marginBottom: 16,
+    color: '#D1D5DB',
+    lineHeight: 20,
   },
-  boldText: {
-    fontWeight: "bold",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  button: {
-    flex: 1,
-    marginHorizontal: 4,
+  infoHighlight: {
+    fontWeight: '600',
+    color: '#10B981',
   },
 });
 
