@@ -84,8 +84,8 @@ export default function HomeLayout() {
     );
   }
 
-  if (!user) {
-    return <Redirect href={URLS.SIGN_IN} />;
+  if (user) {
+    return <Redirect href={URLS.APP_OWNER_SURVEY} />;
   }
 
   const commonScreenOptions = {

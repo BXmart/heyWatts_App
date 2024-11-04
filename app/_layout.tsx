@@ -1,9 +1,10 @@
-import { useFonts } from "expo-font";
-import { Slot, SplashScreen } from "expo-router";
-import { useEffect } from "react";
-import { useColorScheme } from "react-native";
-import useAuthStore from "@/stores/useAuthStore";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useFonts } from 'expo-font';
+import { Redirect, Slot, SplashScreen } from 'expo-router';
+import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
+import useAuthStore from '@/stores/useAuthStore';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { URLS } from '@/utils/constants';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -12,7 +13,7 @@ export default function RootLayout() {
   const { initialize, isLoading } = useAuthStore();
 
   const [fontsLoaded] = useFonts({
-    SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
