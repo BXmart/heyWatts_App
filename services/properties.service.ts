@@ -1,3 +1,4 @@
+import { NewPropertyRequestT } from "@/types/NewPropertyRequest";
 import { API_URL } from "@/utils/constants";
 import axios from "axios";
 
@@ -31,4 +32,9 @@ export async function getCheckProperty({ userId, propertyId }: { userId: string,
   }
   const { data } = await axios.get(API_URL.concat(`/api/v1/web/checkProperty/${userId}?propertyId=${propertyId}`));
   return data
+}
+
+export async function postNewProperty(body: NewPropertyRequestT) {
+  const { data } = await axios.post(API_URL.concat('/api/v1/web/properties'), body);
+  return data;
 }

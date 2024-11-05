@@ -6,14 +6,15 @@ import { UserContextT } from "@/types/UserContext";
 import { router } from "expo-router";
 import { z } from 'zod';
 import { PropertyI } from '@/app/(home)';
+import { UserTypes } from '@/app/sign-up';
 
 const RegisterSchema = z.object({
-  nombre: z.string(),
-  apellidos: z.string(),
+  name: z.string(),
+  surname: z.string(),
   email: z.string().email(),
   password: z.string().min(6),
-  userType: z.enum(["usuario", "instalador"]),
-  organizacion: z.string().optional(),
+  type: z.enum([UserTypes.USUARIO, UserTypes.INSTALADOR]),
+  organizacionName: z.string().optional(),
 });
 
 export type RegisterData = z.infer<typeof RegisterSchema>;
@@ -105,12 +106,12 @@ const useAuthStore = create<AuthStore>((set, get) => ({
 
       const { data } = await axios.post(API_URL.concat('/api/v1/web/register'), formData);
       console.log({ data })
-      if (data.error) {
-        set({ error: data.message, isLoading: false });
-        return
+      if (data) {
+        console.log({ data })
+        get().login(formData.email, formData.password)
       }
 
-      get().login(formData.email, formData.password)
+
 
 
     } catch (error: any) {

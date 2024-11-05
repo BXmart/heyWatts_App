@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Image, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,12 +7,17 @@ import { URLS } from '@/utils/constants';
 import useAuthStore, { RegisterData } from '@/stores/useAuthStore';
 import { z } from 'zod';
 
+export enum UserTypes {
+  USUARIO = 'OWNER',
+  INSTALADOR = 'INSTALLER',
+}
+
 // Define the validation schema with Zod
 const registerSchema = z
   .object({
-    userType: z.enum(['usuario', 'instalador']),
-    nombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(50, 'El nombre no puede exceder 50 caracteres'),
-    apellidos: z.string().min(2, 'Los apellidos deben tener al menos 2 caracteres').max(50, 'Los apellidos no pueden exceder 50 caracteres'),
+    type: z.enum([UserTypes.USUARIO, UserTypes.INSTALADOR]),
+    name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(50, 'El nombre no puede exceder 50 caracteres'),
+    surname: z.string().min(2, 'Los apellidos deben tener al menos 2 caracteres').max(50, 'Los apellidos no pueden exceder 50 caracteres'),
     email: z.string().email('Ingrese un correo electrónico válido').min(1, 'El correo electrónico es requerido'),
     password: z
       .string()
@@ -21,7 +26,7 @@ const registerSchema = z
       .regex(/[a-z]/, 'La contraseña debe contener al menos una letra minúscula')
       .regex(/[0-9]/, 'La contraseña debe contener al menos un número'),
     confirmPassword: z.string(),
-    organizacion: z.string().optional(),
+    organizacionName: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Las contraseñas no coinciden',
@@ -37,14 +42,14 @@ interface FormErrors {
 
 export default function RegisterPage() {
   const { register } = useAuthStore();
-  const [userType, setUserType] = useState<'usuario' | 'instalador'>('usuario');
+  const [userType, setUserType] = useState(UserTypes.USUARIO);
   const [formData, setFormData] = useState<Partial<RegisterSchema>>({
-    nombre: '',
-    apellidos: '',
+    name: '',
+    surname: '',
     email: '',
     password: '',
     confirmPassword: '',
-    organizacion: '',
+    organizacionName: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +59,7 @@ export default function RegisterPage() {
     try {
       registerSchema.parse({
         ...formData,
-        userType,
+        type: userType,
       });
       setErrors({});
       return true;
@@ -71,25 +76,23 @@ export default function RegisterPage() {
     }
   };
 
+  useEffect(() => {
+    console.log({ errors });
+  }, [errors]);
+
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
         const formDataToSubmit: RegisterData = {
-          userType,
-          nombre: formData.nombre!,
-          apellidos: formData.apellidos!,
+          type: userType,
+          name: formData.name!,
+          surname: formData.surname!,
           email: formData.email!,
           password: formData.password!,
-          ...(userType === 'instalador' && { organizacion: formData.organizacion }),
+          ...(userType === UserTypes.USUARIO && { organizacionName: formData.organizacionName }),
         };
-
+        console.log({ formDataToSubmit });
         const result = await register(formDataToSubmit);
-        if (result.error) {
-          Alert.alert('Error', result.message);
-        } else {
-          console.log('Registered successfully', result);
-          router.navigate(URLS.APP_OWNER_SURVEY);
-        }
       } catch (error) {
         Alert.alert('Error', 'Error en el registro. Por favor, intente nuevamente.');
         console.error('Registration failed', error);
@@ -123,30 +126,30 @@ export default function RegisterPage() {
         </View>
         <View style={styles.rightPanel}>
           <View style={styles.tabSelector}>
-            <TouchableOpacity style={[styles.tab, userType === 'usuario' && styles.activeTab]} onPress={() => setUserType('usuario')}>
-              <Text style={[styles.tabText, userType === 'usuario' && styles.activeTabText]}>Usuario</Text>
+            <TouchableOpacity style={[styles.tab, userType === UserTypes.USUARIO && styles.activeTab]} onPress={() => setUserType(UserTypes.USUARIO)}>
+              <Text style={[styles.tabText, userType === UserTypes.USUARIO && styles.activeTabText]}>Usuario</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.tab, userType === 'instalador' && styles.activeTab]} onPress={() => setUserType('instalador')}>
-              <Text style={[styles.tabText, userType === 'instalador' && styles.activeTabText]}>Instalador</Text>
+            <TouchableOpacity style={[styles.tab, userType === UserTypes.INSTALADOR && styles.activeTab]} onPress={() => setUserType(UserTypes.INSTALADOR)}>
+              <Text style={[styles.tabText, userType === UserTypes.INSTALADOR && styles.activeTabText]}>Instalador</Text>
             </TouchableOpacity>
           </View>
 
           <Text style={styles.inputLabel}>Nombre</Text>
-          <TextInput style={[styles.input, errors.nombre && styles.inputError]} onChangeText={(value) => handleChange('nombre', value)} value={formData.nombre} placeholder="Ingrese su nombre" />
-          {errors.nombre && <Text style={styles.errorText}>{errors.nombre}</Text>}
+          <TextInput style={[styles.input, errors.name != null && styles.inputError]} onChangeText={(value) => handleChange('name', value)} value={formData.name} placeholder="Ingrese su nombre" />
+          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
           <Text style={styles.inputLabel}>Apellidos</Text>
           <TextInput
-            style={[styles.input, errors.apellidos && styles.inputError]}
-            onChangeText={(value) => handleChange('apellidos', value)}
-            value={formData.apellidos}
-            placeholder="Ingrese sus apellidos"
+            style={[styles.input, errors.surname != null && styles.inputError]}
+            onChangeText={(value) => handleChange('surname', value)}
+            value={formData.surname}
+            placeholder="Ingrese sus surname"
           />
-          {errors.apellidos && <Text style={styles.errorText}>{errors.apellidos}</Text>}
+          {errors.surname && <Text style={styles.errorText}>{errors.surname}</Text>}
 
           <Text style={styles.inputLabel}>Correo electrónico</Text>
           <TextInput
-            style={[styles.input, errors.email && styles.inputError]}
+            style={[styles.input, errors.email != null && styles.inputError]}
             onChangeText={(value) => handleChange('email', value)}
             value={formData.email}
             placeholder="Ingrese su correo electrónico"
@@ -155,13 +158,13 @@ export default function RegisterPage() {
           />
           {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-          {userType === 'instalador' && (
+          {userType === UserTypes.INSTALADOR && (
             <>
               <Text style={styles.inputLabel}>Nombre de organización</Text>
               <TextInput
-                style={[styles.input, errors.organizacion && styles.inputError]}
-                onChangeText={(value) => handleChange('organizacion', value)}
-                value={formData.organizacion}
+                style={[styles.input, errors.organizacionName != null && styles.inputError]}
+                onChangeText={(value) => handleChange('organizacionName', value)}
+                value={formData.organizacionName}
                 placeholder="Ingrese el nombre de su organización"
               />
               {errors.organizacion && <Text style={styles.errorText}>{errors.organizacion}</Text>}
@@ -169,7 +172,7 @@ export default function RegisterPage() {
           )}
 
           <Text style={styles.inputLabel}>Contraseña</Text>
-          <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
+          <View style={[styles.passwordContainer, errors.password != null && styles.inputError]}>
             <TextInput
               style={styles.passwordInput}
               onChangeText={(value) => handleChange('password', value)}
@@ -184,7 +187,7 @@ export default function RegisterPage() {
           {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
           <Text style={styles.inputLabel}>Confirmar contraseña</Text>
-          <View style={[styles.passwordContainer, errors.confirmPassword && styles.inputError]}>
+          <View style={[styles.passwordContainer, errors.confirmPassword != null && styles.inputError]}>
             <TextInput
               style={styles.passwordInput}
               onChangeText={(value) => handleChange('confirmPassword', value)}

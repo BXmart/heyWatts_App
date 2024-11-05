@@ -1,240 +1,306 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, ActivityIndicator, Image } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, ActivityIndicator, Alert, SafeAreaView, Platform } from 'react-native';
+import MapView from 'react-native-maps';
+import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+import { ScrollView } from 'react-native-gesture-handler';
 
-interface TechnologyOption {
-  id: string;
-  name: string;
-  icon: string;
+import HeaderSection from '../components/welcome-questionnaire/HeaderSection';
+import AddressSection from '../components/welcome-questionnaire/AddressSection';
+import PhotoSection from '../components/welcome-questionnaire/PhotoSection';
+import TechnologiesSection from '../components/welcome-questionnaire/TechnologiesSection';
+import CollapsibleSection from '../components/welcome-questionnaire/CollapsibleSection';
+import useAuthStore from '@/stores/useAuthStore';
+import { postNewProperty } from '@/services/properties.service';
+
+const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+const REVERSE_GEOCODE_URL = 'https://nominatim.openstreetmap.org/reverse';
+
+export enum UserTypes {
+  USUARIO = 'OWNER',
+  INSTALADOR = 'INSTALADOR',
 }
 
-const TECHNOLOGIES: TechnologyOption[] = [
+interface LocationType {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}
+
+interface SearchResult {
+  display_name: string;
+  lat: string;
+  lon: string;
+  address?: {
+    road?: string;
+    house_number?: string;
+    suburb?: string;
+    neighbourhood?: string;
+    city?: string;
+    state?: string;
+    region?: string;
+    postcode?: string;
+    country?: string;
+  };
+}
+
+const TECHNOLOGIES = [
   { id: '1', name: 'Fotovoltaica', icon: 'solar-power' },
   { id: '2', name: 'Batería', icon: 'battery-charging' },
   { id: '3', name: 'Cargador', icon: 'ev-station' },
+  { id: '4', name: 'ACS', icon: 'water-boiler' },
+  { id: '5', name: 'Aire acondicionado', icon: 'air-conditioner' },
+  { id: '6', name: 'Electrodomésticos', icon: 'fridge' },
 ];
 
-const initialData = {
-  name: 'Mi hogar',
-  description: '',
-  interestedDevices: [],
-  image: null,
+const initialLocation = {
+  latitude: 40.4168,
+  longitude: -3.7038,
+  latitudeDelta: 0.0922,
+  longitudeDelta: 0.0421,
 };
 
-export default function WelcomeQuestionnaire() {
+const initialData = {
+  _id: '',
+  name: 'Mi hogar',
+  street: '',
+  province: '',
+  postalCode: '',
+  additionalInfo: '',
+  orientation: '0',
+  monthlyConsumption: '0',
+  surfaceArea: '0',
+  description: '',
+  interestedDevices: [] as string[],
+  image: null as string | null,
+  location: initialLocation,
+};
+
+const MainFormContainer = () => {
+  const mapRef = useRef<MapView>(null);
+  const { user } = useAuthStore();
   const [formData, setFormData] = useState(initialData);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isAddressLoading, setIsAddressLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isAddressExpanded, setIsAddressExpanded] = useState(false);
+  const [isPropertyCreated, setIsPropertyCreated] = useState(user?.user.propertyByDefault !== null);
 
-  const requestCameraPermission = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Se necesita permiso para acceder a la cámara');
-      return false;
-    }
-    return true;
-  };
-
-  const requestMediaPermission = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Se necesita permiso para acceder a la galería');
-      return false;
-    }
-    return true;
-  };
+  useEffect(() => {
+    console.log({ user });
+  }, [user]);
 
   const takePhoto = async () => {
-    const hasPermission = await requestCameraPermission();
-    if (!hasPermission) return;
+    if (!isPropertyCreated) return;
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'Se necesita permiso para acceder a la cámara');
+      return;
+    }
 
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
 
-    if (!result.canceled) {
-      setFormData((prev) => ({ ...prev, image: result.assets[0].uri }));
+      if (!result.canceled && result.assets[0]) {
+        setFormData((prev) => ({ ...prev, image: result.assets[0].uri }));
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+      Alert.alert('Error', 'No se pudo tomar la foto. Por favor, intenta de nuevo.');
     }
   };
 
   const pickImage = async () => {
-    const hasPermission = await requestMediaPermission();
-    if (!hasPermission) return;
+    if (!isPropertyCreated) return;
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'Se necesita permiso para acceder a la galería');
+      return;
+    }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
 
-    if (!result.canceled) {
-      setFormData((prev) => ({ ...prev, image: result.assets[0].uri }));
+      if (!result.canceled && result.assets[0]) {
+        setFormData((prev) => ({ ...prev, image: result.assets[0].uri }));
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'No se pudo seleccionar la imagen. Por favor, intenta de nuevo.');
     }
   };
 
-  const handleSave = async () => {
+  const handleSaveProperty = async () => {
     try {
-      setIsLoading(true);
-      const userInfo = await SecureStore.getItemAsync('userInfo');
-      const { token } = JSON.parse(userInfo || '{}');
-
-      // Create form data for multipart upload
-      const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('interestedDevices', JSON.stringify(formData.interestedDevices));
-
-      if (formData.image) {
-        const filename = formData.image.split('/').pop();
-        const match = /\.(\w+)$/.exec(filename || '');
-        const type = match ? `image/${match[1]}` : 'image';
-
-        formDataToSend.append('image', {
-          uri: formData.image,
-          name: filename,
-          type,
-        } as any);
+      if (!formData.name.trim()) {
+        setErrorMessage('Por favor, introduce un nombre para la propiedad');
+        return;
       }
 
-      await axios.post('/api/v1/web/property', formDataToSend, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
+      setIsSaving(true);
+      setErrorMessage('');
+
+      const userInfo = await SecureStore.getItemAsync('userInfo');
+      if (!userInfo) {
+        throw new Error('No se encontró información del usuario');
+      }
+
+      const formDataToSend = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'location' || key === 'interestedDevices') {
+          formDataToSend.append(key, JSON.stringify(value));
+        } else if (key === 'image' && value) {
+          const filename = value.split('/').pop() || 'image.jpg';
+          const match = /\.(\w+)$/.exec(filename);
+          const type = match ? `image/${match[1]}` : 'image/jpeg';
+          formDataToSend.append('image', {
+            uri: value,
+            name: filename,
+            type,
+          } as any);
+        } else if (value !== null && key !== '_id') {
+          formDataToSend.append(key, String(value));
+        }
       });
 
-      // Navigate to next screen
-      // navigation.navigate('NextScreen');
+      if (formData._id) {
+        await axios.put(`/api/v1/web/property/${formData._id}`, formDataToSend, {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        Alert.alert('¡Éxito!', 'La propiedad se ha actualizado correctamente');
+      } else {
+        const { data } = await postNewProperty({ name: formData.name, description: formData.description, user: { _id: user?.user._id } });
+
+        setFormData((prev) => ({ ...prev, _id: data.data._id }));
+      }
     } catch (error) {
       console.error('Error saving property:', error);
+      Alert.alert('Error', 'No se pudo guardar la propiedad. Por favor, intenta de nuevo.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleFinalize = async () => {
+    try {
+      setIsLoading(true);
+      await handleSaveProperty();
+    } catch (error) {
+      console.error('Error finalizing property:', error);
+      Alert.alert('Error', 'No se pudo finalizar la propiedad. Por favor, intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const toggleTechnology = (techId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      interestedDevices: prev.interestedDevices.includes(techId) ? prev.interestedDevices.filter((id) => id !== techId) : [...prev.interestedDevices, techId],
-    }));
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.title}>¡Bienvenido al Cuestionario</Text>
-            <Text style={styles.subtitle}>de Cliente de heyWatts!</Text>
-            <Text style={styles.description}>Para poder aportarte una experiencia acorde a sus necesidades, rellene el siguiente cuestionario</Text>
-          </View>
+      <View style={styles.contentWrapper}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <HeaderSection errorMessage={errorMessage} />
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>¿Cómo se llama tu propiedad?</Text>
-            <TextInput style={styles.input} value={formData.name} onChangeText={(text) => setFormData((prev) => ({ ...prev, name: text }))} placeholder="Mi hogar" placeholderTextColor="#6B7280" />
-          </View>
+          <View style={styles.formSection}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Nombre de la propiedad</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.name}
+                onChangeText={(text) => {
+                  setErrorMessage('');
+                  setFormData((prev) => ({ ...prev, name: text }));
+                }}
+                placeholder="Mi hogar"
+                placeholderTextColor="#6B7280"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Haz una breve descripción</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={formData.description}
-              onChangeText={(text) => setFormData((prev) => ({ ...prev, description: text }))}
-              placeholder="Ej: Nuestra casa de dos plantas con piscina..."
-              placeholderTextColor="#6B7280"
-              multiline
-              numberOfLines={3}
+            <CollapsibleSection title="Datos opcionales" isExpanded={isAddressExpanded} onToggle={() => setIsAddressExpanded(!isAddressExpanded)}>
+              <AddressSection formData={formData} isAddressLoading={isAddressLoading} mapRef={mapRef} onInputChange={(field, value) => setFormData((prev) => ({ ...prev, [field]: value }))} />
+            </CollapsibleSection>
+            <TouchableOpacity style={[styles.submitButton, isLoading && styles.buttonDisabled]} onPress={handleFinalize} disabled={isLoading}>
+              {isLoading ? <ActivityIndicator color="#DBFFE8" /> : <Text style={styles.submitButtonText}>Crear propiedad</Text>}
+            </TouchableOpacity>
+
+            <PhotoSection
+              isPropertyCreated={isPropertyCreated}
+              image={formData.image}
+              onTakePhoto={takePhoto}
+              onPickImage={pickImage}
+              onRemoveImage={() => setFormData((prev) => ({ ...prev, image: null }))}
             />
-          </View>
 
-          <View style={styles.photoSection}>
-            <Text style={styles.label}>Añade una foto de tu propiedad</Text>
-            <View style={styles.photoButtons}>
-              <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
-                <MaterialCommunityIcons name="camera" size={24} color="#DBFFE8" />
-                <Text style={styles.photoButtonText}>Tomar foto</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
-                <MaterialCommunityIcons name="image" size={24} color="#DBFFE8" />
-                <Text style={styles.photoButtonText}>Galería</Text>
-              </TouchableOpacity>
-            </View>
-            {formData.image && (
-              <View style={styles.imagePreviewContainer}>
-                <Image source={{ uri: formData.image }} style={styles.imagePreview} />
-                <TouchableOpacity style={styles.removeImageButton} onPress={() => setFormData((prev) => ({ ...prev, image: null }))}>
-                  <MaterialCommunityIcons name="close-circle" size={24} color="#DBFFE8" />
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+            <TechnologiesSection
+              technologies={TECHNOLOGIES}
+              selectedTechnologies={formData.interestedDevices}
+              onToggleTechnology={(techId) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  interestedDevices: prev.interestedDevices.includes(techId) ? prev.interestedDevices.filter((id) => id !== techId) : [...prev.interestedDevices, techId],
+                }));
+              }}
+            />
 
-          <View style={styles.technologiesSection}>
-            <Text style={styles.label}>¿Qué tecnologías usas?</Text>
-            <View style={styles.technologiesGrid}>
-              {TECHNOLOGIES.map((tech) => (
-                <TouchableOpacity key={tech.id} style={[styles.technologyCard, formData.interestedDevices.includes(tech.id) && styles.selectedCard]} onPress={() => toggleTechnology(tech.id)}>
-                  <MaterialCommunityIcons name={tech.icon} size={32} color={formData.interestedDevices.includes(tech.id) ? '#DBFFE8' : '#035170'} />
-                  <Text style={[styles.technologyText, formData.interestedDevices.includes(tech.id) && styles.selectedText]}>{tech.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <View style={styles.bottomPadding} />
           </View>
+        </ScrollView>
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSave} disabled={isLoading}>
-            {isLoading ? <ActivityIndicator color="#DBFFE8" /> : <Text style={styles.submitButtonText}>Guardar</Text>}
-          </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={[styles.submitButton, isLoading && styles.buttonDisabled]} onPress={handleFinalize} disabled={isLoading}>
+              {isLoading ? <ActivityIndicator color="#DBFFE8" /> : <Text style={styles.submitButtonText}>Guardar</Text>}
+            </TouchableOpacity>
+          </View>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 30,
     flex: 1,
     backgroundColor: '#0F242A',
   },
-  content: {
+  contentWrapper: {
+    flex: 1,
+    position: 'relative',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     padding: 20,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#DBFFE8',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 20,
-    color: '#DBFFE8',
-    marginTop: 8,
-  },
-  description: {
-    color: '#DBFFE8',
-    textAlign: 'center',
-    marginTop: 12,
+  formSection: {
+    gap: 20,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   label: {
     color: '#DBFFE8',
     fontSize: 16,
-    fontWeight: '500',
     marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
     backgroundColor: '#083344',
@@ -243,86 +309,45 @@ const styles = StyleSheet.create({
     color: '#DBFFE8',
     fontSize: 16,
   },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
+  bottomPadding: {
+    height: 80,
   },
-  photoSection: {
-    marginBottom: 24,
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#0F242A',
+    padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
+    borderTopWidth: 1,
+    borderTopColor: '#083344',
   },
-  photoButtons: {
+  buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     gap: 12,
   },
-  photoButton: {
+  draftButton: {
+    flex: 1,
+    backgroundColor: '#083344',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+  },
+  submitButton: {
     flex: 1,
     backgroundColor: '#035170',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
   },
-  photoButtonText: {
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  draftButtonText: {
     color: '#DBFFE8',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '500',
-  },
-  imagePreviewContainer: {
-    marginTop: 16,
-    position: 'relative',
-  },
-  imagePreview: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    backgroundColor: '#083344',
-  },
-  removeImageButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(15, 36, 42, 0.8)',
-    borderRadius: 12,
-  },
-  technologiesSection: {
-    marginBottom: 24,
-  },
-  technologiesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  technologyCard: {
-    backgroundColor: '#083344',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '31%',
-    aspectRatio: 1,
-  },
-  selectedCard: {
-    backgroundColor: '#035170',
-  },
-  technologyText: {
-    color: '#DBFFE8',
-    marginTop: 8,
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  selectedText: {
-    fontWeight: 'bold',
-  },
-  submitButton: {
-    backgroundColor: '#035170',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 12,
   },
   submitButtonText: {
     color: '#DBFFE8',
@@ -330,3 +355,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default MainFormContainer;
