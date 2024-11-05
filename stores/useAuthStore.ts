@@ -99,15 +99,27 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       set({ error: error.response?.data?.message || 'Login failed', isLoading: false });
     }
   },
-
   register: async (formData: RegisterData) => {
     try {
       set({ isLoading: true, error: null });
-      const { data } = await axios.post(`${API_URL}/api/v1/web/register`, formData);
-      await SecureStore.setItemAsync('userInfo', JSON.stringify(data));
-      set({ user: data, token: data.token, isLoading: false });
+
+      const { data } = await axios.post(API_URL.concat('/api/v1/web/register'), formData);
+      console.log({ data })
+      if (data.error) {
+        set({ error: data.message, isLoading: false });
+        return
+      }
+
+      get().login(formData.email, formData.password)
+
+
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Registration failed', isLoading: false });
+      if (error?.response?.data?.code === 'GW0002') {
+        set({ error: error.response?.data?.message || 'Ya existe un usuario con este correo', isLoading: false })
+      } else {
+
+        set({ error: error.response?.data?.message || 'Registration failed', isLoading: false });
+      }
     }
   },
   logout: async () => {

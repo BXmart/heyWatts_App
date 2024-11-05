@@ -31,10 +31,8 @@ export default function RootLayout() {
   }
 
   return (
-    // <NavigationContainer>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Slot />
     </GestureHandlerRootView>
-    // </NavigationContainer>
   );
 }

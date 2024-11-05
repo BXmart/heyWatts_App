@@ -1,4 +1,4 @@
-import { Link, Redirect, Stack, Tabs, useNavigation, useRouter } from 'expo-router';
+import { Link, Redirect, Stack, Tabs, useNavigation, useRootNavigationState, useRouter } from 'expo-router';
 import React, { PropsWithChildren, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
 import { Pressable, useColorScheme } from 'react-native';
 import { URLS } from '@/utils/constants';
@@ -34,6 +34,7 @@ export default function HomeLayout() {
   const [marketPrices, setMarketPrices] = useState<any>([]);
   const [compensationPrices, setCompensationPrices] = useState<any>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
     if (user && user.user.propertyByDefault?._id && !isInitialized) {
@@ -49,6 +50,9 @@ export default function HomeLayout() {
         })
         .catch((error) => {
           console.error(error);
+          setIsInitialized(true);
+        })
+        .finally(() => {
           setIsInitialized(true);
         });
     }
@@ -76,6 +80,9 @@ export default function HomeLayout() {
     propertiesList,
   };
 
+  // If root nagivation is not loaded
+  if (!rootNavigationState?.key) return null;
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -86,6 +93,10 @@ export default function HomeLayout() {
 
   if (!user) {
     return <Redirect href={URLS.SIGN_IN} />;
+  }
+
+  if (user && user.user.firstTime) {
+    return <Redirect href={URLS.APP_OWNER_SURVEY} />;
   }
 
   const commonScreenOptions = {
