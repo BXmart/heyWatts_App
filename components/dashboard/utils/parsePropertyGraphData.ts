@@ -31,7 +31,7 @@ export function parseData(data: any, dataTypes: string[]): ParsedResult {
 
         return {
           type: dataType == "negativeConsumption" ? "Vuelco a red eléctrica" : dataType == "positiveConsumption" ? "Consumo de red eléctrica" : dataType == "productionCleanVat" ? "Producción fotovoltaica" : "Consumo total",
-          value: item[1] / 1000 || 0,
+          value: dataType == "negativeConsumption" ? Math.abs(item[1] / 1000 || 0) : item[1] / 1000 || 0,
           label: time24Hour,
           datetime: new Date(item[0]),
           frontColor: dataType === 'productionCleanVat' ? '#00FF00' : '#FF0000',

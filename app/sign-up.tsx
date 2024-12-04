@@ -84,9 +84,7 @@ export default function RegisterPage() {
         };
 
         const result = await register(formDataToSubmit);
-        if (result.error) {
-          Alert.alert('Error', result.message);
-        } else {
+        if (result) {
           console.log('Registered successfully', result);
           router.navigate(URLS.APP_OWNER_SURVEY);
         }

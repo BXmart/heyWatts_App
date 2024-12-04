@@ -6,6 +6,7 @@ import { UserContextT } from "@/types/UserContext";
 import { router } from "expo-router";
 import { z } from 'zod';
 import { PropertyI } from '@/app/(home)';
+import { err } from 'react-native-svg';
 
 const RegisterSchema = z.object({
   nombre: z.string(),
@@ -58,7 +59,7 @@ interface AuthState {
 interface AuthActions {
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  register: (formData: RegisterData) => Promise<void>;
+  register: (formData: RegisterData) => Promise<any>;
   logout: () => Promise<void>;
   setCurrentProperty: (propertyId: string) => void;
 }
@@ -104,21 +105,23 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       set({ isLoading: true, error: null });
 
       const { data } = await axios.post(API_URL.concat('/api/v1/web/register'), formData);
-      console.log({ data })
+
       if (data.error) {
         set({ error: data.message, isLoading: false });
-        return
+        return { error: data.message, data: null };
       }
 
       get().login(formData.email, formData.password)
-
+      return { error: "", data };
 
     } catch (error: any) {
       if (error?.response?.data?.code === 'GW0002') {
         set({ error: error.response?.data?.message || 'Ya existe un usuario con este correo', isLoading: false })
+        return { error: "Ya existe un usuario con este correo", data: null };
       } else {
 
-        set({ error: error.response?.data?.message || 'Registration failed', isLoading: false });
+        set({ error: error.response?.data?.message || 'Registro fallido por algún motivo', isLoading: false });
+        return { error: "Registro fallido por algún motivo", data: null };
       }
     }
   },
