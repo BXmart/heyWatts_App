@@ -4,8 +4,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { URLS } from '@/utils/constants';
-import useAuthStore, { RegisterData } from '@/stores/useAuthStore';
+import useAuthStore from '@/stores/useAuthStore';
 import { z } from 'zod';
+import { RegisterData } from '@/types/auth';
 
 export enum UserTypes {
   USUARIO = 'OWNER',
@@ -76,10 +77,6 @@ export default function RegisterPage() {
     }
   };
 
-  useEffect(() => {
-    console.log({ errors });
-  }, [errors]);
-
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
@@ -91,7 +88,6 @@ export default function RegisterPage() {
           password: formData.password!,
           ...(userType === UserTypes.USUARIO && { organizacionName: formData.organizacionName }),
         };
-        console.log({ formDataToSubmit });
         const result = await register(formDataToSubmit);
         if (result) {
           console.log('Registered successfully', result);

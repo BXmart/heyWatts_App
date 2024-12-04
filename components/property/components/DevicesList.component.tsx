@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useFetchExternalCommunications } from "../hooks/useFetchDevices";
-import { DeviceI } from "@/types/Device";
-import { View } from "react-native";
-import { Text } from "react-native-paper";
-import InverterCard from "./InverterCard.component";
-import { ScrollView } from "react-native-gesture-handler";
+import React, { useEffect, useState } from 'react';
+import { useFetchExternalCommunications } from '../hooks/useFetchDevices';
+import { DeviceI } from '@/types/Device';
+import { View } from 'react-native';
+import { Text } from 'react-native-paper';
+import InverterCard from './InverterCard.component';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const DevicesList = ({ propertyDetails }: { propertyDetails: any }) => {
   const [devices, setDevices] = useState<DeviceI[]>();
@@ -12,9 +12,7 @@ const DevicesList = ({ propertyDetails }: { propertyDetails: any }) => {
   const { data } = useFetchExternalCommunications();
 
   useEffect(() => {
-    console.log({ data });
     if (propertyDetails) {
-      console.log(propertyDetails);
       setDevices(propertyDetails.devices.sort((a: any, b: any) => a.priority - b.priority));
     }
   }, [propertyDetails, data]);
@@ -23,18 +21,18 @@ const DevicesList = ({ propertyDetails }: { propertyDetails: any }) => {
     <ScrollView>
       {!!devices &&
         devices.length > 0 &&
-        devices.slice().find((item) => item.authorizedDevice.category === "inverter" || item.authorizedDevice.category === "gateway" || item.authorizedDevice.category === "meter") && (
-          <Text style={{ color: "#DBFFE8", fontSize: 18, fontWeight: "bold" }}>Dispositivos de lectura</Text>
+        devices.slice().find((item) => item.authorizedDevice.category === 'inverter' || item.authorizedDevice.category === 'gateway' || item.authorizedDevice.category === 'meter') && (
+          <Text style={{ color: '#DBFFE8', fontSize: 18, fontWeight: 'bold' }}>Dispositivos de lectura</Text>
         )}
 
       {!!devices &&
         devices.length > 0 &&
         devices
           .slice()
-          .filter((item) => item.authorizedDevice.category === "inverter" || item.authorizedDevice.category === "gateway" || item.authorizedDevice.category === "meter")
+          .filter((item) => item.authorizedDevice.category === 'inverter' || item.authorizedDevice.category === 'gateway' || item.authorizedDevice.category === 'meter')
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((device) => {
-            if (device.authorizedDevice.category === "inverter") {
+            if (device.authorizedDevice.category === 'inverter') {
               return <InverterCard key={device._id} data={device} generalData={data} />;
             }
             /*  if (device.authorizedDevice.category === 'gateway') {

@@ -17,6 +17,12 @@ export async function getPagesPropertiesByUserId({ userId, pageNo, search, pageS
   return data;
 }
 
+export async function putEditProperty(propertyId: string, body: any) {
+  const url = new URL(API_URL.concat(`/api/v1/web/properties/${propertyId}`));
+  const { data } = await axios.put(url.href, body);
+  return data;
+}
+
 export async function getEnergyCompensationPricesByPropertyId(propertyId: string, date: string) {
   const url = new URL(API_URL.concat(`/api/v1/web/properties/${propertyId}/prices`));
   url.searchParams.append('date', date);

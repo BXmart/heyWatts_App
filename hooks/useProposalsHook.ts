@@ -45,7 +45,6 @@ export const useProposals = () => {
     } catch (error) {
       setIsLoading(false);
       setError(true);
-      console.warn(error);
     } finally {
       setIsLoading(false);
     }

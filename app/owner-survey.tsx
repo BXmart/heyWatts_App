@@ -15,6 +15,9 @@ import TechnologiesSection from '../components/welcome-questionnaire/Technologie
 import CollapsibleSection from '../components/welcome-questionnaire/CollapsibleSection';
 import useAuthStore from '@/stores/useAuthStore';
 import { postNewProperty } from '@/services/properties.service';
+import { router } from 'expo-router';
+import { URLS } from '@/utils/constants';
+import { postSurveyFilled } from '@/services/survey.service';
 
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 const REVERSE_GEOCODE_URL = 'https://nominatim.openstreetmap.org/reverse';
@@ -36,19 +39,27 @@ interface SearchResult {
   lat: string;
   lon: string;
   address?: {
-    road?: string;
-    house_number?: string;
-    suburb?: string;
-    neighbourhood?: string;
-    city?: string;
-    state?: string;
-    region?: string;
-    postcode?: string;
-    country?: string;
+    _id: string;
+    name: string;
+    street: string;
+    province: string;
+    postalCode: string;
+    additionalInfo: string;
+    orientation: string;
+    monthlyConsumption: string;
+    surfaceArea: string;
+    description: string;
+    interestedDevices: string[];
+    image: string | null;
+    location: {};
+    locationType: string;
+    direction: string;
+    consumption: string;
+    roofArea: string;
   };
 }
 
-const TECHNOLOGIES = [
+export const TECHNOLOGIES = [
   { id: '1', name: 'Fotovoltaica', icon: 'solar-power' },
   { id: '2', name: 'Batería', icon: 'battery-charging' },
   { id: '3', name: 'Cargador', icon: 'ev-station' },
@@ -64,37 +75,70 @@ const initialLocation = {
   longitudeDelta: 0.0421,
 };
 
-const initialData = {
+export interface Property {
+  _id: string;
+  additionalAddress: string;
+  address: string;
+  consumptionAvailableApi: number;
+  contracts: [];
+  createdAt: string;
+  cups: string;
+  dataRecovered: false;
+  description: string;
+  inclination: number;
+  interestedDevices: string[];
+  isDatadisOK: boolean;
+  isTermAccepted: boolean;
+  latitude: string;
+  longitude: string;
+  m2: number;
+  monthAvg: number;
+  municipality: string;
+  name: string;
+  orientation: number;
+  pointType: number;
+  postalCode: string;
+  productionAvailableApi: number;
+  province: string;
+}
+
+const initialData: Property = {
   _id: '',
-  name: 'Mi hogar',
-  street: '',
-  province: '',
-  postalCode: '',
-  additionalInfo: '',
-  orientation: '0',
-  monthlyConsumption: '0',
-  surfaceArea: '0',
+  additionalAddress: '',
+  address: '',
+  consumptionAvailableApi: 0,
+  contracts: [],
+  createdAt: '2024-12-04 09:59:46',
+  cups: '',
+  dataRecovered: false,
   description: '',
-  interestedDevices: [] as string[],
-  image: null as string | null,
-  location: initialLocation,
+  inclination: 0,
+  interestedDevices: [],
+  isDatadisOK: false,
+  isTermAccepted: false,
+  latitude: '',
+  longitude: '',
+  m2: 0,
+  monthAvg: 0,
+  municipality: '',
+  name: 'Test',
+  orientation: 0,
+  pointType: 0,
+  postalCode: '',
+  productionAvailableApi: 0,
+  province: '',
 };
 
 const MainFormContainer = () => {
   const mapRef = useRef<MapView>(null);
-  const { user } = useAuthStore();
-  const [formData, setFormData] = useState(initialData);
+  const { user, setCurrentProperty, setUserFirstTime } = useAuthStore();
+  const [formData, setFormData] = useState<Property>(initialData);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isAddressLoading, setIsAddressLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isAddressExpanded, setIsAddressExpanded] = useState(false);
   const [isPropertyCreated, setIsPropertyCreated] = useState(user?.user.propertyByDefault !== null);
-
-  useEffect(() => {
-    console.log({ user });
-  }, [user]);
-
   const takePhoto = async () => {
     if (!isPropertyCreated) return;
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -188,9 +232,18 @@ const MainFormContainer = () => {
         });
         Alert.alert('¡Éxito!', 'La propiedad se ha actualizado correctamente');
       } else {
-        const { data } = await postNewProperty({ name: formData.name, description: formData.description, user: { _id: user?.user._id } });
-
-        setFormData((prev) => ({ ...prev, _id: data.data._id }));
+        if (!user) return;
+        const response = await postNewProperty({ ...formData, user: { _id: user?.user._id ?? '' } });
+        if (response) {
+          if (user.user.firstTime) {
+            await postSurveyFilled(user.user._id);
+          }
+          if (user.user.propertyByDefault === null) {
+            setCurrentProperty(response);
+          }
+          setUserFirstTime(user);
+          router.navigate('/(home)');
+        }
       }
     } catch (error) {
       console.error('Error saving property:', error);
@@ -234,7 +287,13 @@ const MainFormContainer = () => {
             </View>
 
             <CollapsibleSection title="Datos opcionales" isExpanded={isAddressExpanded} onToggle={() => setIsAddressExpanded(!isAddressExpanded)}>
-              <AddressSection formData={formData} isAddressLoading={isAddressLoading} mapRef={mapRef} onInputChange={(field, value) => setFormData((prev) => ({ ...prev, [field]: value }))} />
+              <AddressSection
+                formData={formData}
+                setFormData={setFormData}
+                isAddressLoading={isAddressLoading}
+                mapRef={mapRef}
+                onInputChange={(field, value) => setFormData((prev) => ({ ...prev, [field]: value }))}
+              />
             </CollapsibleSection>
             <TouchableOpacity style={[styles.submitButton, isLoading && styles.buttonDisabled]} onPress={handleFinalize} disabled={isLoading}>
               {isLoading ? <ActivityIndicator color="#DBFFE8" /> : <Text style={styles.submitButtonText}>Crear propiedad</Text>}
@@ -252,10 +311,8 @@ const MainFormContainer = () => {
               technologies={TECHNOLOGIES}
               selectedTechnologies={formData.interestedDevices}
               onToggleTechnology={(techId) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  interestedDevices: prev.interestedDevices.includes(techId) ? prev.interestedDevices.filter((id) => id !== techId) : [...prev.interestedDevices, techId],
-                }));
+                const interestedDevice = TECHNOLOGIES.find((tech) => tech.id === techId);
+                setFormData((prev) => ({ ...prev, interestedDevices: interestedDevice ? [...prev.interestedDevices, techId] : [...prev.interestedDevices.filter((id) => id !== techId)] }));
               }}
             />
 

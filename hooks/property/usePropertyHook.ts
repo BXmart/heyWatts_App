@@ -55,11 +55,11 @@ export const useProperty = () => {
   }, [])
 
 
-  useEffect(() => {
-    if (isPropertyOwner !== null && !isPropertyOwner && user?.user.type === ROLES.OWNER) {
-      return router.navigate(URLS.APP_INDEX);
-    }
-  }, [isPropertyOwner])
+  // useEffect(() => {
+  //   if (isPropertyOwner !== null && !isPropertyOwner && user?.user.type === ROLES.OWNER) {
+  //     return router.navigate(URLS.APP_INDEX);
+  //   }
+  // }, [isPropertyOwner])
 
 
   useEffect(() => {

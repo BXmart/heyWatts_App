@@ -24,40 +24,10 @@ interface SearchResult {
 }
 
 interface AddressSectionProps {
-  formData: {
-    _id: string;
-    name: string;
-    street: string;
-    province: string;
-    postalCode: string;
-    additionalInfo: string;
-    orientation: string;
-    monthlyConsumption: string;
-    surfaceArea: string;
-    description: string;
-    interestedDevices: string[];
-    image: string | null;
-    location: {};
-  };
+  formData: any;
   isAddressLoading: boolean;
   mapRef: React.RefObject<MapView>;
-  setFormData: React.Dispatch<
-    React.SetStateAction<{
-      _id: string;
-      name: string;
-      street: string;
-      province: string;
-      postalCode: string;
-      additionalInfo: string;
-      orientation: string;
-      monthlyConsumption: string;
-      surfaceArea: string;
-      description: string;
-      interestedDevices: string[];
-      image: string | null;
-      location: {};
-    }>
-  >;
+  setFormData: React.Dispatch<React.SetStateAction<any>>;
   onInputChange: (key: string, value: string) => void;
 }
 
@@ -111,12 +81,12 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
       const postalCode = address.postcode || '';
       const additionalInfo = [address.suburb, address.neighbourhood, address.district].filter(Boolean).join(', ');
 
-      setFormData((prev) => ({
+      setFormData((prev: any) => ({
         ...prev,
-        street: streetAddress,
+        address: streetAddress,
         province: province,
         postalCode: postalCode,
-        additionalInfo: additionalInfo,
+        additionalAddress: additionalInfo,
       }));
     } catch (error) {
       console.error('Error updating address:', error);
@@ -132,7 +102,7 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
       longitudeDelta: 0.0121,
     };
 
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       location: newLocation,
     }));
@@ -145,7 +115,7 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
 
   const handleMapPress = async (event: any) => {
     const { coordinate } = event.nativeEvent;
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       location: {
         ...coordinate,
@@ -158,7 +128,7 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
 
   const handleMarkerDrag = async (e: any) => {
     const coordinate = e.nativeEvent.coordinate;
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       location: {
         ...coordinate,
@@ -186,7 +156,7 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Ubicación</Text>
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <Searchbar
           placeholder="Buscar dirección"
           onChangeText={(text) => {
@@ -201,17 +171,17 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
           placeholderTextColor="#6B7280"
         />
         {renderSearchResults()}
-      </View>
-      <MapView ref={mapRef} style={styles.map} initialRegion={formData.location} onPress={handleMapPress}>
+      </View> */}
+      {/* <MapView ref={mapRef} style={styles.map} initialRegion={formData.location} onPress={handleMapPress}>
         <Marker coordinate={formData.location} draggable onDragEnd={handleMarkerDrag} />
-      </MapView>
+      </MapView> */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Dirección</Text>
         <View style={styles.inputWrapper}>
           <TextInput
             style={[styles.input, isAddressLoading && styles.inputLoading]}
-            value={formData.street}
-            onChangeText={(text) => onInputChange('street', text)}
+            value={formData.address}
+            onChangeText={(text) => onInputChange('address', text)}
             placeholder="Calle y número"
             placeholderTextColor="#6B7280"
             editable={!isAddressLoading}
@@ -261,8 +231,8 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
           <View style={styles.inputWrapper}>
             <TextInput
               style={styles.input}
-              value={formData.consumption}
-              onChangeText={(text) => onInputChange('consumption', text)}
+              value={formData.monthAvg}
+              onChangeText={(text) => onInputChange('monthAvg', text)}
               placeholder="kWh/mes"
               placeholderTextColor="#6B7280"
               keyboardType="numeric"
@@ -273,7 +243,7 @@ const AddressSection: React.FC<AddressSectionProps> = ({ formData, mapRef, setFo
         <View style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}>
           <Text style={styles.label}>Área del Tejado</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={formData.roofArea} onChangeText={(text) => onInputChange('roofArea', text)} placeholder="m²" placeholderTextColor="#6B7280" keyboardType="numeric" />
+            <TextInput style={styles.input} value={formData.m2} onChangeText={(text) => onInputChange('m2', text)} placeholder="m²" placeholderTextColor="#6B7280" keyboardType="numeric" />
           </View>
         </View>
       </View>

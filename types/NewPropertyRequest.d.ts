@@ -1,5 +1,5 @@
-export type NewPropertyRequestT = {
-  name: string;
-  description: string;
-  user: unknown | { _id: string };
+import { Property } from "@/app/owner-survey";
+
+export interface NewPropertyRequestT extends Property {
+  user: { _id: string };
 };
