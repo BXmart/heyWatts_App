@@ -38,6 +38,13 @@ export async function getDayHistorical(propertyId: string, currentDate: string) 
   return data;
 }
 
+export async function getDayDevicesHistorical(propertyId: string, currentDate: string, deviceIds: string[]) {
+  const { data } = await axios.get(API_URL.concat(`/api/v1/web/property/${propertyId}/devicesHistorics?deviceIds=${deviceIds.join(',')}`), {
+    headers: { CurrentDate: currentDate },
+  });
+  return data;
+}
+
 export async function getDatesDayHistorical(propertyId: string) {
   const { data } = await axios.get(API_URL.concat(`/api/v1/web/properties/${propertyId}/historicDates`));
   return data;

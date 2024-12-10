@@ -4,4 +4,5 @@ export interface ConsumptionGraphPointI {
   cleanVat: number;
   batteryPower: number;
   createdAt: string;
+  pvPower?: number;
 }

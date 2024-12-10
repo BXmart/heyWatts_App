@@ -190,7 +190,7 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
         <G key={`h-${i}`}>
           <Line x1={paddingHorizontal} y1={y} x2={currentWidth - paddingHorizontal} y2={y} stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
           {showLabels && (
-            <SvgText x={paddingHorizontal - 10} y={y + 4} fill="white" fontSize={10} textAnchor="end">
+            <SvgText x={paddingHorizontal} y={y + 4} fill="white" fontSize={10} textAnchor="end">
               {value.toFixed(1)}
             </SvgText>
           )}

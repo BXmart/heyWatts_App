@@ -4,9 +4,13 @@ export interface PropertyDayHistoricI {
   propertyId: number;
   historicConsumption: DayHistoricConsumptionI[];
   historicProduction: DayHistoricProductionI[];
-  device: DayHistoricDeviceI[];
+  deviceList: DeviceSmall[];
 }
 
+export interface DeviceSmall {
+  _id: string;
+  name: string
+}
 export interface DayHistoricDeviceI {
   _id: string;
   deviceId: number;

@@ -1,8 +1,8 @@
-import Checkbox from "expo-checkbox";
-import React, { useEffect, useState } from "react";
-import { View, Text, Modal, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import Checkbox from 'expo-checkbox';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Modal, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 
-const SignalSelector = ({ availableSignals, setSelectedSignals, lineColors, selectedSignals }: any) => {
+const SignalSelector = ({ availableSignals, setSelectedSignals, selectedSignals }: any) => {
   const [isVisible, setIsVisible] = useState(false);
   const [tempSelected, setTempSelected] = useState(selectedSignals);
 
@@ -18,14 +18,14 @@ const SignalSelector = ({ availableSignals, setSelectedSignals, lineColors, sele
     setSelectedSignals(tempSelected);
   }, [tempSelected]);
 
-  const Item = ({ item, index }: { item: any; index: number }) => {
+  const Item = ({ item }: { item: any }) => {
     return (
       <TouchableOpacity style={styles.signalItem} onPress={() => handleToggle(item.value)}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
           <Checkbox color="" value={tempSelected.includes(item.value)} onTouchEnd={() => handleToggle(item.value)} />
-          <Text style={{ width: "auto", color: "white" }}>{item.label}</Text>
+          <Text style={{ width: 'auto', color: 'white' }}>{item.label}</Text>
         </View>
-        <View style={{ backgroundColor: lineColors[index] ?? "black", width: 15, height: 15, borderRadius: 8, marginRight: 10 }} />
+        <View style={{ backgroundColor: item.color, width: 15, height: 15, borderRadius: 8, marginRight: 10 }} />
       </TouchableOpacity>
     );
   };
@@ -36,11 +36,11 @@ const SignalSelector = ({ availableSignals, setSelectedSignals, lineColors, sele
         {availableSignals &&
           availableSignals.map((item: any, index: number) => (
             <TouchableOpacity key={index} style={styles.signalItem} onPress={() => handleToggle(item.value)}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                 <Checkbox color="" value={tempSelected.includes(item.value)} onTouchEnd={() => handleToggle(item.value)} />
-                <Text style={{ width: "auto", color: "white" }}>{item.label}</Text>
+                <Text style={{ width: 'auto', color: 'white' }}>{item.label}</Text>
               </View>
-              <View style={{ backgroundColor: lineColors[index] ?? "black", width: 15, height: 15, borderRadius: 8, marginRight: 10 }} />
+              <View style={{ backgroundColor: item.color, width: 15, height: 15, borderRadius: 8, marginRight: 10 }} />
             </TouchableOpacity>
           ))}
       </View>
@@ -50,23 +50,23 @@ const SignalSelector = ({ availableSignals, setSelectedSignals, lineColors, sele
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#035170",
+    backgroundColor: '#035170',
     padding: 15,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
   },
   buttonText: {
-    color: "white",
+    color: 'white',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: "#1C1C1E",
+    backgroundColor: '#1C1C1E',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -76,12 +76,12 @@ const styles = StyleSheet.create({
     maxHeight: 300,
   },
   signalItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#2C2C2E",
+    borderBottomColor: '#2C2C2E',
   },
   colorIndicator: {
     width: 20,
@@ -90,16 +90,16 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   saveButton: {
-    backgroundColor: "#035170",
+    backgroundColor: '#035170',
     padding: 15,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 20,
   },
   saveButtonText: {
-    color: "white",
+    color: 'white',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 

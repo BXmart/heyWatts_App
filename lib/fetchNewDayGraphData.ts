@@ -7,8 +7,8 @@ moment.locale('es');
 
 export async function fetchNewDayGraphData(callback: (propertyId: string, selectedDay: string) => Promise<PropertyDayHistoricI>, propertyId: string, selectedDay: string) {
   let data = await callback(propertyId!, selectedDay);
-  const { historicConsumption, historicProduction, device } = data;
 
+  const { historicConsumption, deviceList } = data;
   // Red eléctrica
   const consumptionCleanVatDays = new Set();
   const consumptionCleanVat: any = historicConsumption
@@ -21,12 +21,12 @@ export async function fetchNewDayGraphData(callback: (propertyId: string, select
 
   // Producción fotovoltaica
   const productionCleanVatDays = new Set();
-  const productionCleanVat: any = historicProduction
-    .filter((item: ProductionGraphPointI) => {
+  const productionCleanVat: any = historicConsumption
+    .filter((item: ConsumptionGraphPointI) => {
       const formattedDate = moment(item.createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
       return productionCleanVatDays.has(formattedDate) ? false : productionCleanVatDays.add(formattedDate);
     })
-    .map((item: ProductionGraphPointI) => [moment(item.createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), item.cleanVat])
+    .map((item: ConsumptionGraphPointI) => [moment(item.createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), item.pvPower])
     .sort((a: any, b: any) => new Date(a[0]).getTime() - new Date(b[0]).getTime());
 
   // Batería
@@ -124,11 +124,11 @@ export async function fetchNewDayGraphData(callback: (propertyId: string, select
 
     return totalConsumptionWithBattery;
   }
-
   const totalConsumption: any = getTotalConsumptionWithBattery(productionCleanVat, consumptionCleanVat, consumptionBattery);
 
+
   // Devices
-  const historicDevices = device.map((item) => ({
+  /* const historicDevices = deviceList?.map((item) => ({
     name: item.name,
     historic:
       item.historicDeviceAttribute.length > 0
@@ -136,7 +136,7 @@ export async function fetchNewDayGraphData(callback: (propertyId: string, select
           .map((item) => [moment(item.createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DDTHH:mm:ss.SSSZ'), +item.value])
           .sort((a: any, b: any) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
         : [],
-  }));
+  })); */
 
-  return { productionCleanVat, positiveConsumption, negativeConsumption, totalConsumption, consumptionBattery, historicDevices };
+  return { productionCleanVat, positiveConsumption, negativeConsumption, totalConsumption, consumptionBattery, deviceList };
 }
