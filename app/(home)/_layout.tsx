@@ -23,7 +23,7 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import LoadingScreen from '@/components/common/SkeletonLoader/SkeletonLoader.component';
 
 export default function HomeLayout() {
-  const { user, isLoading, setCurrentProperty } = useAuthStore();
+  const { user, isLoading, setCurrentProperty, currentProperty } = useAuthStore();
   const colorScheme = useColorScheme();
   const router = useRouter();
   const navigation = useNavigation();
@@ -33,11 +33,11 @@ export default function HomeLayout() {
   const [properties, setProperties] = useState<PagedPropertiesResponseI>();
   const [marketPrices, setMarketPrices] = useState<any>([]);
   const [compensationPrices, setCompensationPrices] = useState<any>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
   const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
-    if (user && user.user.propertyByDefault?._id && !isInitialized) {
+    console.log(currentProperty);
+    if (currentProperty) {
       initialize()
         .then(([dashboardData, propertyDetails, properties, consumptionData, marketPrices, compensationPrices]) => {
           setDashboardData(dashboardData as OwnerDashboardI);
@@ -46,26 +46,21 @@ export default function HomeLayout() {
           setConsumptionData(consumptionData as EnergyDayPriceI[]);
           setMarketPrices(marketPrices);
           setCompensationPrices(compensationPrices);
-          setIsInitialized(true);
         })
         .catch((error) => {
           console.error(error);
-          setIsInitialized(true);
-        })
-        .finally(() => {
-          setIsInitialized(true);
         });
     }
-  }, [user]);
+  }, [user, currentProperty]);
 
   const initialize = async () => {
     return await Promise.all([
-      getOwnerDashboard(user!.user.propertyByDefault?._id!),
-      getPropertyDetailsById(user!.user.propertyByDefault?._id!),
+      getOwnerDashboard(currentProperty),
+      getPropertyDetailsById(currentProperty),
       getPagesPropertiesByUserId({ userId: user!.user._id, pageSize: '50' }),
-      getDashboardConsumptionAndPredictionGraph({ propertyId: user!.user.propertyByDefault?._id!, date: moment(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss') }),
-      getEnergyPricesByPropertyId(user!.user.propertyByDefault?._id!, moment(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss')),
-      getEnergyCompensationPricesByPropertyId(user!.user.propertyByDefault?._id!, moment(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss')),
+      getDashboardConsumptionAndPredictionGraph({ propertyId: currentProperty, date: moment(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss') }),
+      getEnergyPricesByPropertyId(currentProperty, moment(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss')),
+      getEnergyCompensationPricesByPropertyId(currentProperty, moment(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DD HH:mm:ss')),
     ]);
   };
 

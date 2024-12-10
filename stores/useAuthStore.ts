@@ -16,7 +16,7 @@ const useAuthStore = create<AuthStore>((set, get) => ({
   token: null,
   isLoading: true,
   error: null,
-  currentProperty: null,
+  currentProperty: "",
   currentPropertyObject: null,
   properties: null,
   setUserFirstTime: async (user: UserContextT) => {

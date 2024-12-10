@@ -43,7 +43,7 @@ export interface AuthState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
-  currentProperty: string | null;
+  currentProperty: string;
   currentPropertyObject: Property | null;
   properties: Property[] | null;
 }
