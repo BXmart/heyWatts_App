@@ -186,12 +186,9 @@ const PropertyGraph = React.memo(() => {
   }, [data, selectedSignals, availableSignals, transformData, deviceData]);
 
   const renderGraph = (isLandscape = false) => {
-    if (parsedData.length === 0 || isLoadingDevices) {
-      return <ActivityIndicator size="large" color="#164E63" />;
-    }
-
     return (
       <View style={styles.graphWrapper}>
+        {(parsedData.length === 0 || isLoadingDevices) && !isLoading && <ActivityIndicator size="large" color="#164E63" style={styles.loader} />}
         <CustomAreaChart data={parsedData} showGrid={true} showLabels={true} backgroundColor="#083344" paddingHorizontal={20} paddingVertical={20} />
       </View>
     );
@@ -219,18 +216,20 @@ const PropertyGraph = React.memo(() => {
     }
   };
 
-  if (isLoading) return <ActivityIndicator size="large" color="#164E63" />;
-
   return (
     <View style={[styles.mainContainer, isLandscape && styles.landscapeContainer]}>
+      {isLoading && <ActivityIndicator size="large" color="#164E63" style={styles.loader} />}
       {!isLandscape ? (
         <>
           <View style={styles.fixedSection}>
             <View style={styles.headerRow}>
               <View style={styles.datePickersContainer}>
-                <TouchableOpacity onPress={openDatePickHandler}>
-                  <Text style={styles.title}>{selectedDay.toLocaleString()}</Text>
-                </TouchableOpacity>
+                {Platform.OS == 'android' && (
+                  <TouchableOpacity onPress={openDatePickHandler}>
+                    <Text style={styles.title}>{selectedDay.toLocaleString()}</Text>
+                  </TouchableOpacity>
+                )}
+                {Platform.OS !== 'android' && <>{<DateTimePicker testID="datePicker" value={selectedDay} mode="date" display="default" themeVariant="dark" onChange={onChange} />}</>}
               </View>
             </View>
           </View>
@@ -245,13 +244,6 @@ const PropertyGraph = React.memo(() => {
         </>
       ) : (
         <View style={styles.landscapeGraphContainer}>{renderGraph(true)}</View>
-      )}
-
-      {Platform.OS !== 'android' && (
-        <>
-          {<DateTimePicker testID="datePicker" value={selectedDay} mode="date" display="default" themeVariant="dark" onChange={onChange} />}
-          {<DateTimePicker testID="timePicker" value={time} mode="time" display="default" themeVariant="dark" onChange={onChangeTime} />}
-        </>
       )}
     </View>
   );
@@ -331,8 +323,9 @@ const styles = StyleSheet.create({
   },
   loader: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
+    top: '45%',
+    left: '45%',
+    zIndex: 999,
   },
   modalTitle: {
     fontSize: 20,

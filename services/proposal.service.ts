@@ -5,7 +5,7 @@ import axios from "axios";
 export async function getProposals({ pageNo, show, pageSize, token }: { pageNo?: string | null; show?: string | null; pageSize?: string | null; token: string }) {
   if (token === undefined || token === null || token.length === 0) return;
   const bearerToken = 'Bearer ' + token;
-  const url = new URL(API_URL.concat(`/api/v1/web/p/proposals`));
+  const url = new URL(API_URL.concat(`/api/v1/web/p/proposal`));
   !!pageNo && pageNo !== '0' && url.searchParams.append('pageNo', pageNo?.toString());
   !!pageSize && pageSize !== '0' && url.searchParams.append('pageSize', pageSize?.toString());
   !!show && url.searchParams.append('show', show?.toString());
@@ -17,7 +17,7 @@ export async function getProposals({ pageNo, show, pageSize, token }: { pageNo?:
 export async function getProposalByPropertyId(propertyId: string, token: string) {
   if (token === undefined || token === null || token.length === 0) return;
   const bearerToken = 'Bearer ' + token;
-  const { data } = await axios.get(API_URL.concat(`/api/v1/web/propertiesDetails/${propertyId}/proposals`), { headers: { Authorization: bearerToken } });
+  const { data } = await axios.get(API_URL.concat(`/api/v1/web/propertiesDetails/${propertyId}/proposal`), { headers: { Authorization: bearerToken } });
   return data;
 }
 

@@ -1,64 +1,64 @@
-import React, { useState } from "react";
-import BillTour from "./BillTour.component";
+import React, { useState } from 'react';
+import BillTour from './BillTour.component';
 
 const billData = {
   iberdrola: [
     {
       index: 1,
-      title: "Datos del contrato",
-      text: "En esta sección encontrarás datos del contrato básicos, en concreto el nombre del titular del contrato, la dirección del suministro y la potencias contratada, este último dato es fundamental para poder calcular la parte correspondiente al término de potencia en la factura",
-      popupTitle: "Datos del contrato",
+      title: 'Datos del contrato',
+      text: 'En esta sección encontrarás datos del contrato básicos, en concreto el nombre del titular del contrato, la dirección del suministro y la potencias contratada, este último dato es fundamental para poder calcular la parte correspondiente al término de potencia en la factura',
+      popupTitle: 'Datos del contrato',
       popupText:
-        "En esta sección encontrarás datos del contrato básicos, en concreto el nombre del titular del contrato, la dirección del suministro y la potencias contratada, este último dato es fundamental para poder calcular la parte correspondiente al término de potencia en la factura",
-      height: "300",
-      popupPosition: "top-[60px] right-[-10px]",
+        'En esta sección encontrarás datos del contrato básicos, en concreto el nombre del titular del contrato, la dirección del suministro y la potencias contratada, este último dato es fundamental para poder calcular la parte correspondiente al término de potencia en la factura',
+      height: '300',
+      popupPosition: 'top-[100px] right-[10px]',
       highlightedTerms: [
         {
-          term: "titular",
-          definition: "La persona o entidad legal responsable del contrato.",
+          term: 'titular',
+          definition: 'La persona o entidad legal responsable del contrato.',
         },
         {
-          term: "potencia",
-          definition: "Es la capacidad máxima de consumo eléctrico que tu instalación puede soportar en un momento dado, similar a cuánto puede fluir agua por una tubería sin que esta reviente.",
+          term: 'potencia',
+          definition: 'Es la capacidad máxima de consumo eléctrico que tu instalación puede soportar en un momento dado, similar a cuánto puede fluir agua por una tubería sin que esta reviente.',
         },
       ],
     },
     {
       index: 2,
-      title: "Resumen de la factura",
-      text: "Información general de la facturación con un breve desglose de los términos sin detallar. Además del importe total facturado es importante contrastar aquí los días facturados y la fecha prevista de cobro.",
-      popupTitle: "Resumen de la factura",
+      title: 'Resumen de la factura',
+      text: 'Información general de la facturación con un breve desglose de los términos sin detallar. Además del importe total facturado es importante contrastar aquí los días facturados y la fecha prevista de cobro.',
+      popupTitle: 'Resumen de la factura',
       popupText:
-        "Información general de la facturación con un breve desglose de los términos sin detallar. Además del importe total facturado es importante contrastar aquí los días facturados y la fecha prevista de cobro.",
-      popupPosition: "top-[102px] right-[-14px]",
+        'Información general de la facturación con un breve desglose de los términos sin detallar. Además del importe total facturado es importante contrastar aquí los días facturados y la fecha prevista de cobro.',
+      popupPosition: 'top-[132px] right-[14px]',
       highlightedTerms: [
         {
-          term: "facturación",
-          definition: "Proceso de emitir una factura detallando los cargos por el suministro eléctrico.",
+          term: 'facturación',
+          definition: 'Proceso de emitir una factura detallando los cargos por el suministro eléctrico.',
         },
       ],
     },
     {
       index: 3,
-      title: "Información del consumo eléctrico",
+      title: 'Información del consumo eléctrico',
       text: 'En esta sección puedes ver como has ido evolucionando en tus consumos energéticos durante el año, lo que te sirve para ver tu "estacionalidad" en el consumo, es importante entender que estos consumos son valores totales en el mes y medias estadísticas, sirven para ayudar a ver la evolución si los comparas con otras facturas anteriores pero no son datos detallados.',
-      popupTitle: "Información del consumo eléctrico",
+      popupTitle: 'Información del consumo eléctrico',
       popupText:
         'En esta sección puedes ver como has ido evolucionando en tus consumos energéticos durante el año, lo que te sirve para ver tu "estacionalidad" en el consumo, es importante entender que estos consumos son valores totales en el mes y medias estadísticas, sirven para ayudar a ver la evolución si los comparas con otras facturas anteriores pero no son datos detallados.',
-      popupPosition: "top-[225px] right-[-14px]",
+      popupPosition: 'top-[225px] right-[-14px]',
       highlightedTerms: [
         {
-          term: "consumos energéticos",
-          definition: "La cantidad de energía eléctrica utilizada durante un período específico.",
+          term: 'consumos energéticos',
+          definition: 'La cantidad de energía eléctrica utilizada durante un período específico.',
         },
       ],
     },
     {
       index: 4,
-      title: "Detalle de la factura",
+      title: 'Detalle de la factura',
       text: ``,
-      popupTitle: "Detalle de la factura",
-      popupPosition: "top-[85px] right-[210px]",
+      popupTitle: 'Detalle de la factura',
+      popupPosition: 'top-[95px] right-[210px]',
       popupText: `Al inicio de esta sección de la factura puede resultar confuso que bajo el término “ENERGÍA” se englobe tanto la energía como la potencia, a pesar de ser conceptos distintos. La energía se refiere a la electricidad consumida, mientras que la potencia es la capacidad máxima de electricidad que puedes tener disponible en tu hogar.
 
 vamos a tratar de explicar los detalles de esta factura de electricidad y cómo se calculan los distintos costos:
@@ -93,37 +93,37 @@ Advertencia: La factura también puede incluir otros gastos menores relacionados
       isLongContent: true,
       highlightedTerms: [
         {
-          term: "energía",
-          definition: "La electricidad consumida, medida en kilovatios-hora (kWh).",
+          term: 'energía',
+          definition: 'La electricidad consumida, medida en kilovatios-hora (kWh).',
         },
         {
-          term: "potencia",
-          definition: "Es la capacidad máxima de consumo eléctrico que tu instalación puede soportar en un momento dado, similar a cuánto puede fluir agua por una tubería sin que esta reviente.",
+          term: 'potencia',
+          definition: 'Es la capacidad máxima de consumo eléctrico que tu instalación puede soportar en un momento dado, similar a cuánto puede fluir agua por una tubería sin que esta reviente.',
         },
       ],
     },
     {
       index: 5,
-      title: "Información adicional",
-      text: "En esta sección se detallan las características del contrato eléctrico, resaltar como importante que aquí podrás encontrar el CUPS, el nombre de la empresa distribuidora (que en este caso es i-DE, la empresa distribuidora de Iberdrola, pero podría ser otra aunque el contrato lo tengas con Iberdrola) y el tipo de tarifa ATR (acceso a terceros a a la red) que es una suerte de tarifa de distribución, que en el caso del ejemplo el el 2.0TD",
-      popupTitle: "Información adicional",
+      title: 'Información adicional',
+      text: 'En esta sección se detallan las características del contrato eléctrico, resaltar como importante que aquí podrás encontrar el CUPS, el nombre de la empresa distribuidora (que en este caso es i-DE, la empresa distribuidora de Iberdrola, pero podría ser otra aunque el contrato lo tengas con Iberdrola) y el tipo de tarifa ATR (acceso a terceros a a la red) que es una suerte de tarifa de distribución, que en el caso del ejemplo el el 2.0TD',
+      popupTitle: 'Información adicional',
       popupText:
-        "En esta sección se detallan las características del contrato eléctrico, resaltar como importante que aquí podrás encontrar el CUPS, el nombre de la empresa distribuidora (que en este caso es i-DE, la empresa distribuidora de Iberdrola, pero podría ser otra aunque el contrato lo tengas con Iberdrola) y el tipo de tarifa ATR (acceso a terceros a a la red) que es una suerte de tarifa de distribución, que en el caso del ejemplo el el 2.0TD",
-      popupPosition: "top-[255px] right-[200px]",
+        'En esta sección se detallan las características del contrato eléctrico, resaltar como importante que aquí podrás encontrar el CUPS, el nombre de la empresa distribuidora (que en este caso es i-DE, la empresa distribuidora de Iberdrola, pero podría ser otra aunque el contrato lo tengas con Iberdrola) y el tipo de tarifa ATR (acceso a terceros a a la red) que es una suerte de tarifa de distribución, que en el caso del ejemplo el el 2.0TD',
+      popupPosition: 'top-[255px] right-[200px]',
       highlightedTerms: [
         {
-          term: "CUPS",
-          definition: "Código Unívoco de Punto de Suministro: Identificador único para cada punto de suministro de electricidad.",
+          term: 'CUPS',
+          definition: 'Código Unívoco de Punto de Suministro: Identificador único para cada punto de suministro de electricidad.',
         },
         {
-          term: "ATR",
+          term: 'ATR',
           definition:
-            "Tarifa de acceso a la red, también conocida como tarifa de distribución o peaje eléctrico: son las cuotas reguladas por el gobierno que los consumidores pagan por el uso de las redes de transporte y distribución de electricidad, cubriendo los costes de mantenimiento y operación de la red.",
+            'Tarifa de acceso a la red, también conocida como tarifa de distribución o peaje eléctrico: son las cuotas reguladas por el gobierno que los consumidores pagan por el uso de las redes de transporte y distribución de electricidad, cubriendo los costes de mantenimiento y operación de la red.',
         },
         {
-          term: "2.0TD",
+          term: '2.0TD',
           definition:
-            "Tarifa de acceso para consumidores domésticos y pequeños negocios con potencia contratada inferior a 15 kW, con precios que varían según la hora de consumo (punta, llano, valle) para fomentar un uso eficiente de la energía.",
+            'Tarifa de acceso para consumidores domésticos y pequeños negocios con potencia contratada inferior a 15 kW, con precios que varían según la hora de consumo (punta, llano, valle) para fomentar un uso eficiente de la energía.',
         },
       ],
     },

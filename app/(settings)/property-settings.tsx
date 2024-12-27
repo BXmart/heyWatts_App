@@ -94,7 +94,7 @@ const PropertyEditScreen = () => {
           <View style={styles.formSection}>
             <Text style={styles.sectionTitle}>Localización</Text>
             <View style={styles.inputGroup}>
-              {['address', 'additionalAddress', 'municipality', 'province', 'postalCode'].map((field) => (
+              {['direccion', 'direccionAdicional', 'municipio', 'provincia', 'codigoPostal'].map((field) => (
                 <Controller
                   key={field}
                   control={control}

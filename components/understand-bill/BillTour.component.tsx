@@ -73,6 +73,7 @@ interface BillTourProps {
 const TourPopup: React.FC<TourPopupProps> = ({ data, visible, position }) => {
   if (!visible) return null;
   const isLongContent = data.isLongContent;
+  console.log(position);
   return (
     <View style={[styles.popupContainer, position, isLongContent && styles.popupContainerLarge]}>
       <View style={[styles.popup, { position: 'relative', top: 0 }, isLongContent && styles.popupLarge]}>
@@ -117,15 +118,15 @@ const TOUR_CONFIG: TourConfig = {
   pages: {
     page1: {
       points: [
-        { id: 1, number: '1', position: { top: '15%', left: '24%' }, popupPosition: { top: 60, right: 5 } },
-        { id: 2, number: '2', position: { top: '35%', left: '24%' }, popupPosition: { top: 102, right: 5 } },
+        { id: 1, number: '1', position: { top: '15%', left: '24%' }, popupPosition: { top: 130, right: 5 } },
+        { id: 2, number: '2', position: { top: '35%', left: '24%' }, popupPosition: { top: 242, right: 5 } },
       ],
     },
     page2: {
       points: [
         { id: 3, number: '3', position: { top: '1%', right: '45%' }, popupPosition: { top: 40, right: 14 } },
-        { id: 4, number: '4', position: { top: '25%', right: '45%' }, popupPosition: { top: 165, left: 20 } },
-        { id: 5, number: '5', position: { bottom: '38%', left: '23%' }, popupPosition: { top: 255, right: 0 } },
+        { id: 4, number: '4', position: { top: '25%', right: '45%' }, popupPosition: { top: 185, left: 20 } },
+        { id: 5, number: '5', position: { bottom: '38%', left: '23%' }, popupPosition: { top: 75, right: 0 } },
       ],
     },
   },

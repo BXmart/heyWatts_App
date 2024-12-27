@@ -25,6 +25,7 @@ export const useProposals = () => {
       if (currentProperty === undefined || currentProperty === null || user === undefined) {
         return null;
       } else {
+        console.log(user!.token)
         const response = await getProposalByPropertyId(currentProperty, user!.token);
         if (response) {
           const filteredData = response.filter((proposal) => proposal.property?._id === currentProperty);

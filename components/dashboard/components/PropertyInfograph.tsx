@@ -54,7 +54,7 @@ const PropertyInfograph = ({ data, hasBattery, hasInverter, isLoading }: { data:
               </Text>
             </View>
             {/* <Feather name={getArrowDirection(-data.propertyResume.production, "up")} size={24} color="#10B981" /> */}
-            <DottedLine style={{ top: 35, left: 15.5, position: 'absolute' }} length={50} dotSize={10} dotColor="#10B981" reverse={false} direction="vertical" duration={3000} />
+            <DottedLine style={{ top: 25, left: 15, position: 'absolute' }} length={50} dotSize={10} dotColor="#10B981" reverse={false} direction="vertical" duration={3000} />
           </View>
         )}
 
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   topSection: {
     position: 'absolute',
     top: 0,
-    right: 72,
+    right: 81,
     alignItems: 'center',
     flexDirection: 'column',
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     flexDirection: 'column',
     bottom: 0,
-    left: 75.5,
+    left: 84,
   },
   leftSection: {
     position: 'absolute',

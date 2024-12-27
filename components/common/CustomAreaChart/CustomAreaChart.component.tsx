@@ -1,21 +1,23 @@
 import React, { useCallback, useState, useMemo } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, Modal, StatusBar, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity, Modal, StatusBar } from 'react-native';
 import Svg, { Path, Line, Text as SvgText, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAnimatedReaction, useSharedValue, withSpring, runOnJS } from 'react-native-reanimated';
 import Feather from '@expo/vector-icons/Feather';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const MINIMUM_ZOOM = 1;
+const MAXIMUM_ZOOM = 24;
+const DEFAULT_TIME_RANGE = { start: 0, end: 24, total: 24 };
+const DEFAULT_VALUE_RANGE = { min: 0, max: 100 };
+
 const getScreenDimensions = () => {
   const { width, height } = Dimensions.get('window');
   return {
-    width: Math.max(width, height), // Landscape width
-    height: Math.min(width, height), // Landscape height
+    width: Math.max(width, height),
+    height: Math.min(width, height),
   };
 };
-
-const MINIMUM_ZOOM = 1;
-const MAXIMUM_ZOOM = 24;
 
 interface DataPoint {
   value: number;
@@ -45,7 +47,7 @@ interface CustomAreaChartProps {
 
 const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
   data,
-  height = 300,
+  height = 290,
   width = Dimensions.get('window').width,
   paddingHorizontal = 40,
   paddingVertical = 30,
@@ -71,8 +73,8 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
     };
   }, [isFullscreen]);
 
-  // Use full screen dimensions when in fullscreen mode, swapping width and height
-  const currentWidth = isFullscreen ? SCREEN_HEIGHT : width; // Swap height and width
+  // Use full screen dimensions when in fullscreen mode
+  const currentWidth = isFullscreen ? SCREEN_HEIGHT : width;
   const currentHeight = isFullscreen ? SCREEN_WIDTH : height;
   const chartWidth = currentWidth - paddingHorizontal * 2;
   const chartHeight = currentHeight - paddingVertical * 2;
@@ -95,10 +97,9 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
     return hours + minutes / 60;
   }, []);
 
-  // Calculate the actual time range from the data
   const timeRange = useMemo(() => {
     if (!data.length || !data[0].data.length) {
-      return { start: 0, end: 24, total: 24 };
+      return DEFAULT_TIME_RANGE;
     }
 
     const allTimes = data.flatMap((series) => series.data.map((point) => getTimeFromLabel(point.label)));
@@ -114,7 +115,9 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
   }, [data, getTimeFromLabel]);
 
   const getMinMaxValues = useCallback(() => {
-    if (!data?.length || !data[0]?.data?.length) return { min: 0, max: 100 };
+    if (!data?.length || !data[0]?.data?.length) {
+      return DEFAULT_VALUE_RANGE;
+    }
     const allValues = data.flatMap((series) => series.data.map((point) => point.value));
     return {
       min: Math.min(...allValues, 0),
@@ -190,7 +193,7 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
         <G key={`h-${i}`}>
           <Line x1={paddingHorizontal} y1={y} x2={currentWidth - paddingHorizontal} y2={y} stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
           {showLabels && (
-            <SvgText x={paddingHorizontal} y={y + 4} fill="white" fontSize={10} textAnchor="end">
+            <SvgText x={paddingHorizontal - 5} y={y + 4} fill="white" fontSize={10} textAnchor="end">
               {value.toFixed(1)}
             </SvgText>
           )}
@@ -212,7 +215,7 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
           <G key={`v-${time}`}>
             <Line x1={x} y1={paddingVertical} x2={x} y2={currentHeight - paddingVertical} stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
             {showLabels && (
-              <SvgText x={x} y={currentHeight - 10} fill="white" fontSize={10} textAnchor="middle">
+              <SvgText x={x} y={currentHeight - paddingVertical + 20} fill="white" fontSize={10} textAnchor="middle">
                 {`${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toFixed(0).padStart(2, '0')}`}
               </SvgText>
             )}
@@ -243,22 +246,14 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
       isPinching.value = true;
     })
     .onUpdate((event) => {
-      // Calculate new scale
       const newScale = Math.min(Math.max(startScale.value * event.scale, MINIMUM_ZOOM), MAXIMUM_ZOOM);
       scale.value = newScale;
 
-      // Adjust pinch center based on orientation
-      const pinchCenter = isFullscreen
-        ? event.focalY - paddingHorizontal // Use Y coordinate in landscape
-        : event.focalX - paddingHorizontal;
+      const pinchCenter = isFullscreen ? event.focalY - paddingHorizontal : event.focalX - paddingHorizontal;
 
       const newX = startX.value + pinchCenter * (1 - event.scale);
-
-      // Calculate bounds
       const maxOffset = 0;
       const minOffset = -chartWidth * (1 - 1 / newScale);
-
-      // Apply bounds
       offsetX.value = Math.min(maxOffset, Math.max(minOffset, newX));
     })
     .onEnd(() => {
@@ -277,7 +272,6 @@ const CustomAreaChart: React.FC<CustomAreaChartProps> = ({
       startX.value = offsetX.value;
     })
     .onUpdate((event) => {
-      // Use translationY instead of translationX when in landscape mode
       const translation = isFullscreen ? event.translationY : event.translationX;
       const newX = startX.value + translation;
       const maxOffset = 0;

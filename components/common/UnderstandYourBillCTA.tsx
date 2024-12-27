@@ -7,6 +7,7 @@ const UnderstandYourBillCTA = () => {
   const router = useRouter();
 
   const handleCTApress = () => {
+    console.log('here');
     router.push('/understand-your-bill');
   };
   return (
@@ -35,6 +36,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
+    zIndex: 999,
   },
   fabText: {
     color: '#000000',
